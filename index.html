@@ -8,320 +8,470 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .rtl { direction: rtl; text-align: right; }
-        .chart-container { height: 300px; margin: 20px 0; }
-        select, input { color: #374151 !important; background-color: white !important; }
-        select option { color: #374151 !important; background-color: white !important; }
-        .expense-item { border-right: 4px solid #e5e7eb; }
-        .expense-item.coffee { border-right-color: #8b4513; }
-        .expense-item.food { border-right-color: #22c55e; }
-        .expense-item.treats { border-right-color: #f59e0b; }
-        .expense-item.other { border-right-color: #6366f1; }
-        @media print {
-            body { margin: 0; padding: 20px; }
-            .no-print { display: none !important; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .btn-danger:hover {
+            transform: translateY(-1px);
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+            color: #333;
+            background: white;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        select option {
+            color: #333;
+            background: white;
+        }
+        .expense-item {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        .expense-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .category-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        .navigation {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: #4CAF50;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+        .category-management {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .category-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e9ecef;
+        }
+        .category-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
         }
     </style>
 </head>
-<body class="bg-gray-50 rtl">
-    <div class="container mx-auto px-4 py-6 max-w-4xl">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg shadow-lg mb-6">
-            <h1 class="text-3xl font-bold text-center">
-                <i class="fas fa-coins ml-2"></i>
-                קופה קטנה
-            </h1>
-            <p class="text-center text-blue-100 mt-2">ניהול הוצאות אישיות קטנות ויומיומיות</p>
-        </div>
-
-        <!-- Navigation -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="flex flex-wrap justify-center p-4 space-x-2 space-x-reverse">
-                <button onclick="showSection('add-expense')" class="nav-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg m-1">
-                    <i class="fas fa-plus ml-2"></i>הוסף הוצאה
+<body>
+    <div class="app-container">
+        <div class="navigation">
+            <div class="text-center mb-4">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-piggy-bank text-green-500"></i>
+                    קופה קטנה
+                </h1>
+                <p class="text-gray-600">ניהול הוצאות אישיות קטנות</p>
+            </div>
+            
+            <div class="flex flex-wrap justify-center gap-2">
+                <button class="nav-btn active" onclick="showPage('add-expense')">
+                    <i class="fas fa-plus"></i> הוסף הוצאה
                 </button>
-                <button onclick="showSection('expenses-list')" class="nav-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg m-1">
-                    <i class="fas fa-list ml-2"></i>רשימת הוצאות
+                <button class="nav-btn" onclick="showPage('expenses-list')">
+                    <i class="fas fa-list"></i> רשימת הוצאות
                 </button>
-                <button onclick="showSection('reports')" class="nav-btn bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg m-1">
-                    <i class="fas fa-chart-bar ml-2"></i>דוחות
+                <button class="nav-btn" onclick="showPage('reports')">
+                    <i class="fas fa-chart-bar"></i> דוחות
                 </button>
-                <button onclick="showSection('categories')" class="nav-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg m-1">
-                    <i class="fas fa-tags ml-2"></i>ניהול קטגוריות
+                <button class="nav-btn" onclick="showPage('categories')">
+                    <i class="fas fa-tags"></i> ניהול קטגוריות
                 </button>
             </div>
         </div>
 
-        <!-- Add Expense Section -->
-        <div id="add-expense" class="section bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-plus text-blue-500 ml-2"></i>הוספת הוצאה חדשה
-            </h2>
-            <form id="expense-form" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Add Expense Page -->
+        <div id="add-expense" class="page active">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-plus-circle text-green-500"></i>
+                    הוסף הוצאה חדשה
+                </h2>
+                
+                <form id="expense-form" class="space-y-4">
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">סכום (₪)</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            <i class="fas fa-shekel-sign"></i> סכום
+                        </label>
                         <input type="number" id="amount" step="0.01" min="0" required 
-                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                               placeholder="הכנס סכום...">
                     </div>
+                    
                     <div>
-                        <label class="block text-gray-700 font-semibold mb-2">תאריך</label>
-                        <input type="date" id="date" required 
-                               class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            <i class="fas fa-tag"></i> קטגוריה
+                        </label>
+                        <select id="category" required>
+                            <option value="">בחר קטגוריה...</option>
+                        </select>
                     </div>
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">תיאור</label>
-                    <input type="text" id="description" required placeholder="לדוגמה: קפה הפוך, חטיף שוקולד"
-                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">קטגוריה</label>
-                    <select id="category" required 
-                            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <option value="">בחר קטגוריה...</option>
-                    </select>
-                </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold transition duration-300">
-                    <i class="fas fa-save ml-2"></i>שמור הוצאה
-                </button>
-            </form>
+                    
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            <i class="fas fa-edit"></i> תיאור
+                        </label>
+                        <input type="text" id="description" required 
+                               placeholder="תיאור קצר של ההוצאה...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            <i class="fas fa-comment"></i> הערה קצרה (אופציונלי)
+                        </label>
+                        <textarea id="note" rows="2" 
+                                placeholder="הערה נוספת..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">
+                            <i class="fas fa-calendar"></i> תאריך
+                        </label>
+                        <input type="date" id="date" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary w-full">
+                        <i class="fas fa-save"></i> שמור הוצאה
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <!-- Expenses List Section -->
-        <div id="expenses-list" class="section bg-white rounded-lg shadow-md p-6 mb-6 hidden">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold text-gray-800">
-                    <i class="fas fa-list text-green-500 ml-2"></i>רשימת הוצאות
+        <!-- Expenses List Page -->
+        <div id="expenses-list" class="page">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-list text-blue-500"></i>
+                    רשימת הוצאות
                 </h2>
-                <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
-                    <select id="filter-category" class="p-2 border border-gray-300 rounded-lg">
+                
+                <div class="mb-4 flex flex-wrap gap-2">
+                    <select id="filter-category" class="flex-1">
                         <option value="">כל הקטגוריות</option>
                     </select>
-                    <select id="sort-by" class="p-2 border border-gray-300 rounded-lg">
-                        <option value="date-desc">תאריך - חדש לישן</option>
-                        <option value="date-asc">תאריך - ישן לחדש</option>
-                        <option value="amount-desc">סכום - גבוה לנמוך</option>
-                        <option value="amount-asc">סכום - נמוך לגבוה</option>
+                    <select id="sort-by">
+                        <option value="date-desc">תאריך (חדש לישן)</option>
+                        <option value="date-asc">תאריך (ישן לחדש)</option>
+                        <option value="amount-desc">סכום (גבוה לנמוך)</option>
+                        <option value="amount-asc">סכום (נמוך לגבוה)</option>
                     </select>
                 </div>
-            </div>
-            <div id="expenses-container" class="space-y-3">
-                <!-- Expenses will be loaded here -->
-            </div>
-            <div id="total-display" class="text-center mt-6 p-4 bg-gray-100 rounded-lg">
-                <span class="text-lg font-bold">סך הכל: <span id="total-amount">₪0</span></span>
+                
+                <div id="expenses-container"></div>
+                
+                <div id="total-display" class="mt-4 p-4 bg-gray-100 rounded-lg text-center">
+                    <strong>סה"כ הוצאות מוצגות: <span id="total-amount">₪0</span></strong>
+                </div>
             </div>
         </div>
 
-        <!-- Reports Section -->
-        <div id="reports" class="section bg-white rounded-lg shadow-md p-6 mb-6 hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-chart-bar text-purple-500 ml-2"></i>דוחות והצגה ויזואלית
-            </h2>
-            
-            <!-- Report Period Selector -->
-            <div class="mb-6">
-                <div class="flex flex-wrap justify-center gap-2">
-                    <button onclick="showReport('weekly')" class="report-btn bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
-                        דוח שבועי
+        <!-- Reports Page -->
+        <div id="reports" class="page">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-chart-bar text-purple-500"></i>
+                    דוחות והצגה ויזואלית
+                </h2>
+                
+                <div class="mb-4 flex flex-wrap gap-2">
+                    <button class="btn-secondary" onclick="showReport('week')">
+                        <i class="fas fa-calendar-week"></i> דוח שבועי
                     </button>
-                    <button onclick="showReport('monthly')" class="report-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                        דוח חודשי
+                    <button class="btn-secondary" onclick="showReport('month')">
+                        <i class="fas fa-calendar-alt"></i> דוח חודשי
                     </button>
-                    <button onclick="showReport('yearly')" class="report-btn bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg">
-                        דוח שנתי
+                    <button class="btn-secondary" onclick="showReport('year')">
+                        <i class="fas fa-calendar"></i> דוח שנתי
+                    </button>
+                    <button class="btn-secondary" onclick="exportToCSV()">
+                        <i class="fas fa-download"></i> ייצא ל-CSV
                     </button>
                 </div>
-            </div>
-
-            <!-- Report Summary -->
-            <div id="report-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div class="bg-blue-100 p-4 rounded-lg text-center">
-                    <h3 class="font-semibold text-blue-800">סך הכל</h3>
-                    <p id="report-total" class="text-2xl font-bold text-blue-600">₪0</p>
-                </div>
-                <div class="bg-green-100 p-4 rounded-lg text-center">
-                    <h3 class="font-semibold text-green-800">מספר הוצאות</h3>
-                    <p id="report-count" class="text-2xl font-bold text-green-600">0</p>
-                </div>
-                <div class="bg-orange-100 p-4 rounded-lg text-center">
-                    <h3 class="font-semibold text-orange-800">ממוצע יומי</h3>
-                    <p id="report-average" class="text-2xl font-bold text-orange-600">₪0</p>
-                </div>
-            </div>
-
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="text-lg font-semibold text-center mb-4">חלוקה לפי קטגוריות</h3>
-                    <div class="chart-container">
-                        <canvas id="pie-chart"></canvas>
+                
+                <div id="report-summary" class="bg-gray-100 p-4 rounded-lg mb-4"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">חלוקה לפי קטגוריות</h3>
+                        <div class="chart-container">
+                            <canvas id="pie-chart"></canvas>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="text-lg font-semibold text-center mb-4">מגמות לאורך זמן</h3>
-                    <div class="chart-container">
-                        <canvas id="line-chart"></canvas>
+                    
+                    <div class="card">
+                        <h3 class="text-lg font-bold mb-2">מגמות לאורך זמן</h3>
+                        <div class="chart-container">
+                            <canvas id="line-chart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Export Button -->
-            <div class="text-center mt-6">
-                <button onclick="exportToCSV()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold">
-                    <i class="fas fa-download ml-2"></i>ייצא ל-CSV
-                </button>
-            </div>
         </div>
 
-        <!-- Categories Management Section -->
-        <div id="categories" class="section bg-white rounded-lg shadow-md p-6 mb-6 hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">
-                <i class="fas fa-tags text-orange-500 ml-2"></i>ניהול קטגוריות
-            </h2>
-            
-            <!-- Add New Category -->
-            <div class="bg-gray-50 p-4 rounded-lg mb-6">
-                <h3 class="text-lg font-semibold mb-3">הוסף קטגוריה חדשה</h3>
-                <div class="flex gap-2">
-                    <input type="text" id="new-category-name" placeholder="שם הקטגוריה החדשה" 
-                           class="flex-1 p-3 border border-gray-300 rounded-lg">
-                    <button onclick="addCategory()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-3 rounded-lg">
-                        <i class="fas fa-plus"></i> הוסף
-                    </button>
+        <!-- Categories Management Page -->
+        <div id="categories" class="page">
+            <div class="card">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">
+                    <i class="fas fa-tags text-orange-500"></i>
+                    ניהול קטגוריות
+                </h2>
+                
+                <!-- Add New Category -->
+                <div class="category-management">
+                    <h3 class="text-lg font-bold mb-3">הוסף קטגוריה חדשה</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-category-name" placeholder="שם הקטגוריה..." class="flex-1">
+                        <input type="color" id="new-category-color" class="color-picker" value="#4CAF50">
+                        <button onclick="addNewCategory()" class="btn-primary">
+                            <i class="fas fa-plus"></i> הוסף
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Categories List -->
+                <div id="categories-list">
+                    <h3 class="text-lg font-bold mb-3">קטגוריות קיימות</h3>
+                    <div id="categories-container"></div>
                 </div>
             </div>
-
-            <!-- Categories List -->
-            <div id="categories-list" class="space-y-3">
-                <!-- Categories will be loaded here -->
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="text-center text-gray-600 mt-8">
-            <p><i class="fas fa-coins text-blue-500"></i> קופה קטנה - ניהול הוצאות אישיות פשוט ויעיל</p>
         </div>
     </div>
 
     <!-- Edit Expense Modal -->
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">ערוך הוצאה</h3>
+            <h3 class="text-lg font-bold mb-4">ערוך הוצאה</h3>
             <form id="edit-form" class="space-y-4">
                 <input type="hidden" id="edit-id">
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">סכום (₪)</label>
-                    <input type="number" id="edit-amount" step="0.01" min="0" required 
-                           class="w-full p-3 border border-gray-300 rounded-lg">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">סכום</label>
+                    <input type="number" id="edit-amount" step="0.01" min="0" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">תיאור</label>
-                    <input type="text" id="edit-description" required 
-                           class="w-full p-3 border border-gray-300 rounded-lg">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">קטגוריה</label>
+                    <select id="edit-category" required></select>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">קטגוריה</label>
-                    <select id="edit-category" required 
-                            class="w-full p-3 border border-gray-300 rounded-lg">
-                    </select>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">תיאור</label>
+                    <input type="text" id="edit-description" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 font-semibold mb-2">תאריך</label>
-                    <input type="date" id="edit-date" required 
-                           class="w-full p-3 border border-gray-300 rounded-lg">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">הערה</label>
+                    <textarea id="edit-note" rows="2"></textarea>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">תאריך</label>
+                    <input type="date" id="edit-date" required>
                 </div>
                 <div class="flex gap-2">
-                    <button type="submit" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg">
-                        שמור שינויים
-                    </button>
-                    <button type="button" onclick="closeEditModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg">
-                        ביטול
-                    </button>
+                    <button type="submit" class="btn-primary flex-1">שמור שינויים</button>
+                    <button type="button" onclick="closeEditModal()" class="btn-secondary flex-1">ביטול</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Edit Category Modal -->
+    <div id="edit-category-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">ערוך קטגוריה</h3>
+            <div class="space-y-4">
+                <input type="hidden" id="edit-category-id">
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">שם הקטגוריה</label>
+                    <input type="text" id="edit-category-name" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">צבע</label>
+                    <input type="color" id="edit-category-color" class="color-picker">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="saveEditCategory()" class="btn-primary flex-1">שמור שינויים</button>
+                    <button onclick="closeEditCategoryModal()" class="btn-secondary flex-1">ביטול</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Data storage
+        // Global variables
         let expenses = JSON.parse(localStorage.getItem('expenses')) || [];
         let categories = JSON.parse(localStorage.getItem('categories')) || [
-            { name: 'קפה', color: '#8b4513', class: 'coffee' },
-            { name: 'אוכל/נישנושים', color: '#22c55e', class: 'food' },
-            { name: 'פינוקים', color: '#f59e0b', class: 'treats' },
-            { name: 'אחר', color: '#6366f1', class: 'other' }
+            { id: 1, name: 'קפה', color: '#8B4513', isDefault: true },
+            { id: 2, name: 'אוכל/נישנושים', color: '#FF6347', isDefault: true },
+            { id: 3, name: 'פינוקים', color: '#FFD700', isDefault: true },
+            { id: 4, name: 'אחר', color: '#808080', isDefault: true }
         ];
+        let nextExpenseId = Math.max(...expenses.map(e => e.id || 0), 0) + 1;
+        let nextCategoryId = Math.max(...categories.map(c => c.id || 0), 0) + 1;
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('date').valueAsDate = new Date();
             updateCategorySelects();
-            showSection('add-expense');
-            loadExpenses();
+            updateCategoriesList();
+            updateExpensesList();
+            saveToStorage();
         });
 
-        // Save data to localStorage
-        function saveData() {
+        // Navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Update specific page content
+            if (pageId === 'expenses-list') {
+                updateExpensesList();
+            } else if (pageId === 'reports') {
+                showReport('month');
+            } else if (pageId === 'categories') {
+                updateCategoriesList();
+            }
+        }
+
+        // Save to localStorage
+        function saveToStorage() {
             localStorage.setItem('expenses', JSON.stringify(expenses));
             localStorage.setItem('categories', JSON.stringify(categories));
         }
 
-        // Show section
-        function showSection(sectionName) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionName).classList.remove('hidden');
-            
-            if (sectionName === 'expenses-list') {
-                loadExpenses();
-            } else if (sectionName === 'reports') {
-                showReport('monthly');
-            } else if (sectionName === 'categories') {
-                loadCategories();
-            }
-        }
-
-        // Update category selects
-        function updateCategorySelects() {
-            const selects = ['category', 'edit-category', 'filter-category'];
-            selects.forEach(selectId => {
-                const select = document.getElementById(selectId);
-                if (select) {
-                    const currentValue = select.value;
-                    select.innerHTML = selectId === 'filter-category' ? 
-                        '<option value="">כל הקטגוריות</option>' : 
-                        '<option value="">בחר קטגוריה...</option>';
-                    
-                    categories.forEach(cat => {
-                        const option = document.createElement('option');
-                        option.value = cat.name;
-                        option.textContent = cat.name;
-                        select.appendChild(option);
-                    });
-                    
-                    if (currentValue) select.value = currentValue;
-                }
-            });
-        }
-
-        // Add expense
+        // Add Expense
         document.getElementById('expense-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const expense = {
-                id: Date.now(),
+                id: nextExpenseId++,
                 amount: parseFloat(document.getElementById('amount').value),
-                description: document.getElementById('description').value,
                 category: document.getElementById('category').value,
-                date: document.getElementById('date').value
+                description: document.getElementById('description').value,
+                note: document.getElementById('note').value,
+                date: document.getElementById('date').value,
+                timestamp: new Date().getTime()
             };
             
             expenses.push(expense);
-            saveData();
+            saveToStorage();
             
             // Reset form
             this.reset();
@@ -330,205 +480,401 @@
             alert('ההוצאה נשמרה בהצלחה!');
         });
 
-        // Load expenses
-        function loadExpenses() {
+        // Update category selects
+        function updateCategorySelects() {
+            const selects = ['category', 'edit-category', 'filter-category'];
+            
+            selects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (!select) return;
+                
+                const currentValue = select.value;
+                select.innerHTML = selectId === 'filter-category' ? '<option value="">כל הקטגוריות</option>' : '<option value="">בחר קטגוריה...</option>';
+                
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.name;
+                    option.textContent = cat.name;
+                    option.style.color = '#333';
+                    select.appendChild(option);
+                });
+                
+                select.value = currentValue;
+            });
+        }
+
+        // Categories Management
+        function addNewCategory() {
+            const name = document.getElementById('new-category-name').value.trim();
+            const color = document.getElementById('new-category-color').value;
+            
+            if (!name) {
+                alert('אנא הכנס שם לקטגוריה');
+                return;
+            }
+            
+            if (categories.some(cat => cat.name === name)) {
+                alert('קטגוריה עם השם הזה כבר קיימת');
+                return;
+            }
+            
+            const newCategory = {
+                id: nextCategoryId++,
+                name: name,
+                color: color,
+                isDefault: false
+            };
+            
+            categories.push(newCategory);
+            saveToStorage();
+            updateCategorySelects();
+            updateCategoriesList();
+            
+            // Clear form
+            document.getElementById('new-category-name').value = '';
+            document.getElementById('new-category-color').value = '#4CAF50';
+            
+            alert('הקטגוריה נוספה בהצלחה!');
+        }
+
+        function editCategory(categoryId) {
+            const category = categories.find(cat => cat.id === categoryId);
+            if (!category) return;
+            
+            document.getElementById('edit-category-id').value = category.id;
+            document.getElementById('edit-category-name').value = category.name;
+            document.getElementById('edit-category-color').value = category.color;
+            
+            document.getElementById('edit-category-modal').classList.remove('hidden');
+            document.getElementById('edit-category-modal').classList.add('flex');
+        }
+
+        function saveEditCategory() {
+            const categoryId = parseInt(document.getElementById('edit-category-id').value);
+            const newName = document.getElementById('edit-category-name').value.trim();
+            const newColor = document.getElementById('edit-category-color').value;
+            
+            if (!newName) {
+                alert('אנא הכנס שם לקטגוריה');
+                return;
+            }
+            
+            const category = categories.find(cat => cat.id === categoryId);
+            if (!category) return;
+            
+            const oldName = category.name;
+            category.name = newName;
+            category.color = newColor;
+            
+            // Update expenses with old category name
+            expenses.forEach(expense => {
+                if (expense.category === oldName) {
+                    expense.category = newName;
+                }
+            });
+            
+            saveToStorage();
+            updateCategorySelects();
+            updateCategoriesList();
+            closeEditCategoryModal();
+            
+            alert('הקטגוריה עודכנה בהצלחה!');
+        }
+
+        function closeEditCategoryModal() {
+            document.getElementById('edit-category-modal').classList.add('hidden');
+            document.getElementById('edit-category-modal').classList.remove('flex');
+        }
+
+        function deleteCategory(categoryId) {
+            const category = categories.find(cat => cat.id === categoryId);
+            if (!category) return;
+            
+            if (category.isDefault) {
+                alert('לא ניתן למחוק קטגוריות ברירת מחדל');
+                return;
+            }
+            
+            const expensesInCategory = expenses.filter(exp => exp.category === category.name);
+            
+            if (expensesInCategory.length > 0) {
+                if (!confirm(`יש ${expensesInCategory.length} הוצאות בקטגוריה "${category.name}". האם אתה בטוח שברצונך למחוק אותה? ההוצאות יועברו לקטגוריה "אחר".`)) {
+                    return;
+                }
+                
+                // Move expenses to "אחר" category
+                expenses.forEach(expense => {
+                    if (expense.category === category.name) {
+                        expense.category = 'אחר';
+                    }
+                });
+            } else {
+                if (!confirm(`האם אתה בטוח שברצונך למחוק את הקטגוריה "${category.name}"?`)) {
+                    return;
+                }
+            }
+            
+            categories = categories.filter(cat => cat.id !== categoryId);
+            saveToStorage();
+            updateCategorySelects();
+            updateCategoriesList();
+            
+            alert('הקטגוריה נמחקה בהצלחה!');
+        }
+
+        function updateCategoriesList() {
+            const container = document.getElementById('categories-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            categories.forEach(category => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'category-item';
+                
+                categoryItem.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="category-color" style="background-color: ${category.color}"></span>
+                        <span class="font-medium">${category.name}</span>
+                        ${category.isDefault ? '<span class="text-xs text-gray-500 mr-2">(ברירת מחדל)</span>' : ''}
+                    </div>
+                    <div class="category-actions">
+                        <button onclick="editCategory(${category.id})" class="btn-secondary">
+                            <i class="fas fa-edit"></i> ערוך
+                        </button>
+                        ${!category.isDefault ? `
+                            <button onclick="deleteCategory(${category.id})" class="btn-danger">
+                                <i class="fas fa-trash"></i> מחק
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(categoryItem);
+            });
+        }
+
+        // Expenses List
+        function updateExpensesList() {
             const container = document.getElementById('expenses-container');
             const filterCategory = document.getElementById('filter-category').value;
             const sortBy = document.getElementById('sort-by').value;
             
-            let filteredExpenses = expenses;
-            
-            // Filter by category
-            if (filterCategory) {
-                filteredExpenses = expenses.filter(exp => exp.category === filterCategory);
-            }
+            let filteredExpenses = expenses.filter(expense => 
+                !filterCategory || expense.category === filterCategory
+            );
             
             // Sort expenses
             filteredExpenses.sort((a, b) => {
-                switch (sortBy) {
-                    case 'date-desc': return new Date(b.date) - new Date(a.date);
-                    case 'date-asc': return new Date(a.date) - new Date(b.date);
-                    case 'amount-desc': return b.amount - a.amount;
-                    case 'amount-asc': return a.amount - b.amount;
-                    default: return new Date(b.date) - new Date(a.date);
+                switch(sortBy) {
+                    case 'date-desc':
+                        return new Date(b.date) - new Date(a.date);
+                    case 'date-asc':
+                        return new Date(a.date) - new Date(b.date);
+                    case 'amount-desc':
+                        return b.amount - a.amount;
+                    case 'amount-asc':
+                        return a.amount - b.amount;
+                    default:
+                        return new Date(b.date) - new Date(a.date);
                 }
             });
             
-            // Display expenses
             container.innerHTML = '';
+            
+            if (filteredExpenses.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 py-8">אין הוצאות להצגה</p>';
+                document.getElementById('total-amount').textContent = '₪0';
+                return;
+            }
+            
             let total = 0;
             
             filteredExpenses.forEach(expense => {
                 total += expense.amount;
                 const category = categories.find(cat => cat.name === expense.category);
-                const expenseClass = category ? category.class : 'other';
+                const categoryColor = category ? category.color : '#808080';
                 
-                const expenseDiv = document.createElement('div');
-                expenseDiv.className = `expense-item ${expenseClass} bg-gray-50 p-4 rounded-lg`;
-                expenseDiv.innerHTML = `
-                    <div class="flex justify-between items-center">
+                const expenseItem = document.createElement('div');
+                expenseItem.className = 'expense-item';
+                expenseItem.innerHTML = `
+                    <div class="flex justify-between items-start">
                         <div class="flex-1">
-                            <div class="flex justify-between items-start mb-2">
-                                <h3 class="font-semibold text-gray-800">${expense.description}</h3>
-                                <span class="text-lg font-bold text-gray-700">₪${expense.amount.toFixed(2)}</span>
+                            <div class="flex items-center mb-2">
+                                <span class="category-color" style="background-color: ${categoryColor}"></span>
+                                <span class="font-bold text-lg">₪${expense.amount.toFixed(2)}</span>
+                                <span class="text-gray-600 text-sm mr-2">${expense.category}</span>
                             </div>
-                            <div class="text-sm text-gray-600">
-                                <span class="bg-gray-200 px-2 py-1 rounded text-xs ml-2">${expense.category}</span>
-                                <span>${new Date(expense.date).toLocaleDateString('he-IL')}</span>
-                            </div>
+                            <p class="font-medium">${expense.description}</p>
+                            ${expense.note ? `<p class="text-gray-600 text-sm mt-1"><i class="fas fa-comment"></i> ${expense.note}</p>` : ''}
+                            <p class="text-gray-500 text-sm mt-1">
+                                <i class="fas fa-calendar"></i> ${new Date(expense.date).toLocaleDateString('he-IL')}
+                            </p>
                         </div>
-                        <div class="flex gap-2 mr-4">
-                            <button onclick="editExpense(${expense.id})" class="text-blue-500 hover:text-blue-700">
+                        <div class="flex gap-2">
+                            <button onclick="editExpense(${expense.id})" class="btn-secondary">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button onclick="deleteExpense(${expense.id})" class="text-red-500 hover:text-red-700">
+                            <button onclick="deleteExpense(${expense.id})" class="btn-danger">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                 `;
-                container.appendChild(expenseDiv);
+                container.appendChild(expenseItem);
             });
             
             document.getElementById('total-amount').textContent = `₪${total.toFixed(2)}`;
-            
-            if (filteredExpenses.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500 py-8">אין הוצאות להצגה</p>';
-            }
         }
 
-        // Edit expense
-        function editExpense(id) {
-            const expense = expenses.find(exp => exp.id === id);
+        // Edit/Delete Expense
+        function editExpense(expenseId) {
+            const expense = expenses.find(exp => exp.id === expenseId);
             if (!expense) return;
             
             document.getElementById('edit-id').value = expense.id;
             document.getElementById('edit-amount').value = expense.amount;
-            document.getElementById('edit-description').value = expense.description;
             document.getElementById('edit-category').value = expense.category;
+            document.getElementById('edit-description').value = expense.description;
+            document.getElementById('edit-note').value = expense.note || '';
             document.getElementById('edit-date').value = expense.date;
             
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-modal').classList.add('flex');
         }
 
-        // Close edit modal
         function closeEditModal() {
             document.getElementById('edit-modal').classList.add('hidden');
             document.getElementById('edit-modal').classList.remove('flex');
         }
 
-        // Handle edit form submission
+        function deleteExpense(expenseId) {
+            if (confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) {
+                expenses = expenses.filter(exp => exp.id !== expenseId);
+                saveToStorage();
+                updateExpensesList();
+            }
+        }
+
+        // Edit form submit
         document.getElementById('edit-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const id = parseInt(document.getElementById('edit-id').value);
-            const expenseIndex = expenses.findIndex(exp => exp.id === id);
+            const expenseId = parseInt(document.getElementById('edit-id').value);
+            const expense = expenses.find(exp => exp.id === expenseId);
             
-            if (expenseIndex !== -1) {
-                expenses[expenseIndex] = {
-                    id: id,
-                    amount: parseFloat(document.getElementById('edit-amount').value),
-                    description: document.getElementById('edit-description').value,
-                    category: document.getElementById('edit-category').value,
-                    date: document.getElementById('edit-date').value
-                };
+            if (expense) {
+                expense.amount = parseFloat(document.getElementById('edit-amount').value);
+                expense.category = document.getElementById('edit-category').value;
+                expense.description = document.getElementById('edit-description').value;
+                expense.note = document.getElementById('edit-note').value;
+                expense.date = document.getElementById('edit-date').value;
                 
-                saveData();
-                loadExpenses();
+                saveToStorage();
+                updateExpensesList();
                 closeEditModal();
                 alert('ההוצאה עודכנה בהצלחה!');
             }
         });
 
-        // Delete expense
-        function deleteExpense(id) {
-            if (confirm('האם אתה בטוח שברצונך למחוק הוצאה זו?')) {
-                expenses = expenses.filter(exp => exp.id !== id);
-                saveData();
-                loadExpenses();
-            }
-        }
+        // Filter and sort listeners
+        document.getElementById('filter-category').addEventListener('change', updateExpensesList);
+        document.getElementById('sort-by').addEventListener('change', updateExpensesList);
 
-        // Filter and sort event listeners
-        document.getElementById('filter-category').addEventListener('change', loadExpenses);
-        document.getElementById('sort-by').addEventListener('change', loadExpenses);
-
-        // Show report
+        // Reports
         function showReport(period) {
             const now = new Date();
-            let filteredExpenses = [];
+            let startDate, endDate;
             
-            switch (period) {
-                case 'weekly':
-                    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                    filteredExpenses = expenses.filter(exp => new Date(exp.date) >= weekAgo);
+            switch(period) {
+                case 'week':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+                    endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 6);
                     break;
-                case 'monthly':
-                    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-                    filteredExpenses = expenses.filter(exp => new Date(exp.date) >= monthStart);
+                case 'month':
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
                     break;
-                case 'yearly':
-                    const yearStart = new Date(now.getFullYear(), 0, 1);
-                    filteredExpenses = expenses.filter(exp => new Date(exp.date) >= yearStart);
-                    break;
-            }
-            
-            updateReportSummary(filteredExpenses, period);
-            updateCharts(filteredExpenses, period);
-        }
-
-        // Update report summary
-        function updateReportSummary(expenses, period) {
-            const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-            const count = expenses.length;
-            
-            let days = 1;
-            switch (period) {
-                case 'weekly': days = 7; break;
-                case 'monthly': days = new Date().getDate(); break;
-                case 'yearly': 
-                    const now = new Date();
-                    const start = new Date(now.getFullYear(), 0, 1);
-                    days = Math.ceil((now - start) / (1000 * 60 * 60 * 24));
+                case 'year':
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31);
                     break;
             }
             
-            const average = days > 0 ? total / days : 0;
-            
-            document.getElementById('report-total').textContent = `₪${total.toFixed(2)}`;
-            document.getElementById('report-count').textContent = count;
-            document.getElementById('report-average').textContent = `₪${average.toFixed(2)}`;
-        }
-
-        // Update charts
-        let pieChart, lineChart;
-        
-        function updateCharts(expenses, period) {
-            updatePieChart(expenses);
-            updateLineChart(expenses, period);
-        }
-
-        function updatePieChart(expenses) {
-            const categoryTotals = {};
-            expenses.forEach(exp => {
-                categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+            const periodExpenses = expenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate >= startDate && expenseDate <= endDate;
             });
+            
+            displayReportSummary(periodExpenses, period);
+            displayCharts(periodExpenses);
+        }
+
+        function displayReportSummary(periodExpenses, period) {
+            const total = periodExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+            const avgPerDay = total / getDaysInPeriod(period);
+            
+            const periodNames = {
+                'week': 'שבועי',
+                'month': 'חודשי',
+                'year': 'שנתי'
+            };
+            
+            document.getElementById('report-summary').innerHTML = `
+                <h3 class="text-lg font-bold mb-2">סיכום דוח ${periodNames[period]}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600">₪${total.toFixed(2)}</div>
+                        <div class="text-sm text-gray-600">סה"כ הוצאות</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600">${periodExpenses.length}</div>
+                        <div class="text-sm text-gray-600">מספר הוצאות</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">₪${avgPerDay.toFixed(2)}</div>
+                        <div class="text-sm text-gray-600">ממוצע יומי</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getDaysInPeriod(period) {
+            const now = new Date();
+            switch(period) {
+                case 'week': return 7;
+                case 'month': return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                case 'year': return (now.getFullYear() % 4 === 0) ? 366 : 365;
+                default: return 30;
+            }
+        }
+
+        function displayCharts(periodExpenses) {
+            displayPieChart(periodExpenses);
+            displayLineChart(periodExpenses);
+        }
+
+        function displayPieChart(periodExpenses) {
+            const categoryTotals = {};
+            
+            periodExpenses.forEach(expense => {
+                categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+            });
+            
+            const ctx = document.getElementById('pie-chart').getContext('2d');
+            
+            if (window.pieChart) {
+                window.pieChart.destroy();
+            }
             
             const labels = Object.keys(categoryTotals);
             const data = Object.values(categoryTotals);
             const colors = labels.map(label => {
                 const category = categories.find(cat => cat.name === label);
-                return category ? category.color : '#6366f1';
+                return category ? category.color : '#808080';
             });
             
-            const ctx = document.getElementById('pie-chart').getContext('2d');
-            
-            if (pieChart) {
-                pieChart.destroy();
-            }
-            
-            pieChart = new Chart(ctx, {
+            window.pieChart = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: labels,
@@ -544,44 +890,51 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom',
-                            rtl: true,
-                            textDirection: 'rtl'
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((context.parsed * 100) / total).toFixed(1);
+                                    return `${context.label}: ₪${context.parsed.toFixed(2)} (${percentage}%)`;
+                                }
+                            }
                         }
                     }
                 }
             });
         }
 
-        function updateLineChart(expenses, period) {
+        function displayLineChart(periodExpenses) {
             const dailyTotals = {};
             
-            expenses.forEach(exp => {
-                const date = exp.date;
-                dailyTotals[date] = (dailyTotals[date] || 0) + exp.amount;
+            periodExpenses.forEach(expense => {
+                const date = expense.date;
+                dailyTotals[date] = (dailyTotals[date] || 0) + expense.amount;
             });
             
             const sortedDates = Object.keys(dailyTotals).sort();
-            const labels = sortedDates.map(date => new Date(date).toLocaleDateString('he-IL'));
-            const data = sortedDates.map(date => dailyTotals[date]);
+            const amounts = sortedDates.map(date => dailyTotals[date]);
             
             const ctx = document.getElementById('line-chart').getContext('2d');
             
-            if (lineChart) {
-                lineChart.destroy();
+            if (window.lineChart) {
+                window.lineChart.destroy();
             }
             
-            lineChart = new Chart(ctx, {
+            window.lineChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels: sortedDates.map(date => new Date(date).toLocaleDateString('he-IL')),
                     datasets: [{
                         label: 'הוצאות יומיות',
-                        data: data,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        data: amounts,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.1)',
                         borderWidth: 2,
-                        fill: true
+                        fill: true,
+                        tension: 0.4
                     }]
                 },
                 options: {
@@ -589,13 +942,17 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            rtl: true,
-                            textDirection: 'rtl'
+                            display: false
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '₪' + value;
+                                }
+                            }
                         }
                     }
                 }
@@ -610,136 +967,32 @@
             }
             
             const BOM = '\uFEFF';
-            const headers = ['תאריך', 'תיאור', 'קטגוריה', 'סכום'];
-            const csvContent = BOM + headers.join(',') + '\n' +
-                expenses.map(exp => [
-                    new Date(exp.date).toLocaleDateString('he-IL'),
-                    `"${exp.description}"`,
-                    `"${exp.category}"`,
-                    exp.amount.toFixed(2)
-                ].join(',')).join('\n');
+            let csvContent = BOM + 'תאריך,תיאור,קטגוריה,סכום,הערה\n';
             
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+            expenses.forEach(expense => {
+                const date = new Date(expense.date).toLocaleDateString('he-IL');
+                const row = [
+                    date,
+                    `"${expense.description}"`,
+                    `"${expense.category}"`,
+                    expense.amount,
+                    `"${expense.note || ''}"`
+                ].join(',');
+                csvContent += row + '\n';
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `קופה_קטנה_${new Date().toISOString().split('T')[0]}.csv`;
-            link.click();
-        }
-
-        // Category management
-        function loadCategories() {
-            const container = document.getElementById('categories-list');
-            container.innerHTML = '';
             
-            categories.forEach(category => {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'bg-gray-50 p-4 rounded-lg flex justify-between items-center';
-                categoryDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 rounded-full ml-3" style="background-color: ${category.color}"></div>
-                        <span class="font-semibold">${category.name}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editCategory('${category.name}')" class="text-blue-500 hover:text-blue-700 px-2 py-1">
-                            <i class="fas fa-edit"></i> ערוך
-                        </button>
-                        ${!['קפה', 'אוכל/נישנושים', 'פינוקים', 'אחר'].includes(category.name) ? 
-                            `<button onclick="deleteCategory('${category.name}')" class="text-red-500 hover:text-red-700 px-2 py-1">
-                                <i class="fas fa-trash"></i> מחק
-                            </button>` : ''}
-                    </div>
-                `;
-                container.appendChild(categoryDiv);
-            });
-        }
-
-        function addCategory() {
-            const name = document.getElementById('new-category-name').value.trim();
-            if (!name) {
-                alert('אנא הכנס שם לקטגוריה');
-                return;
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `קופה_קטנה_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
-            
-            if (categories.find(cat => cat.name === name)) {
-                alert('קטגוריה זו כבר קיימת');
-                return;
-            }
-            
-            const colors = ['#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316', '#ec4899'];
-            const color = colors[categories.length % colors.length];
-            
-            categories.push({
-                name: name,
-                color: color,
-                class: name.toLowerCase().replace(/[^a-z0-9]/g, '')
-            });
-            
-            saveData();
-            updateCategorySelects();
-            loadCategories();
-            document.getElementById('new-category-name').value = '';
-            alert('הקטגוריה נוספה בהצלחה!');
-        }
-
-        function editCategory(oldName) {
-            const newName = prompt('הכנס שם חדש לקטגוריה:', oldName);
-            if (!newName || newName === oldName) return;
-            
-            if (categories.find(cat => cat.name === newName)) {
-                alert('קטגוריה זו כבר קיימת');
-                return;
-            }
-            
-            // Update category name
-            const category = categories.find(cat => cat.name === oldName);
-            if (category) {
-                category.name = newName;
-            }
-            
-            // Update expenses with old category name
-            expenses.forEach(exp => {
-                if (exp.category === oldName) {
-                    exp.category = newName;
-                }
-            });
-            
-            saveData();
-            updateCategorySelects();
-            loadCategories();
-            alert('הקטגוריה עודכנה בהצלחה!');
-        }
-
-        function deleteCategory(name) {
-            const expensesInCategory = expenses.filter(exp => exp.category === name);
-            if (expensesInCategory.length > 0) {
-                if (!confirm(`יש ${expensesInCategory.length} הוצאות בקטגוריה זו. האם אתה בטוח שברצונך למחוק אותה? ההוצאות יועברו לקטגוריה "אחר".`)) {
-                    return;
-                }
-                
-                // Move expenses to "אחר" category
-                expenses.forEach(exp => {
-                    if (exp.category === name) {
-                        exp.category = 'אחר';
-                    }
-                });
-            }
-            
-            categories = categories.filter(cat => cat.name !== name);
-            saveData();
-            updateCategorySelects();
-            loadCategories();
-            alert('הקטגוריה נמחקה בהצלחה!');
-        }
-
-        // Initialize categories on first load
-        if (categories.length === 0) {
-            categories = [
-                { name: 'קפה', color: '#8b4513', class: 'coffee' },
-                { name: 'אוכל/נישנושים', color: '#22c55e', class: 'food' },
-                { name: 'פינוקים', color: '#f59e0b', class: 'treats' },
-                { name: 'אחר', color: '#6366f1', class: 'other' }
-            ];
-            saveData();
         }
     </script>
 </body>
