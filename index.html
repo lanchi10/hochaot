@@ -1,1114 +1,647 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyMoney - אפליקציית ניהול כספי</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            font-family: 'Heebo', sans-serif;
-        }
-        
-        .dark-mode {
-            background-color: #1a1a2e;
-            color: #eee;
-        }
-        
-        .dark-mode .bg-white {
-            background-color: #16213e !important;
-        }
-        
-        .dark-mode .bg-gray-50 {
-            background-color: #0f172a !important;
-        }
-        
-        .dark-mode .text-gray-900 {
-            color: #eee !important;
-        }
-        
-        .dark-mode .text-gray-600 {
-            color: #cbd5e1 !important;
-        }
-        
-        .dark-mode .border-gray-300 {
-            border-color: #374151 !important;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .animate-bounce-in {
-            animation: bounceIn 0.6s ease-out;
-        }
-        
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .progress-bar {
-            transition: width 0.5s ease-in-out;
-        }
-        
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 15px 20px;
-            border-radius: 8px;
-            color: white;
-            font-weight: 500;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification.success {
-            background-color: #10b981;
-        }
-        
-        .notification.warning {
-            background-color: #f59e0b;
-        }
-        
-        .notification.error {
-            background-color: #ef4444;
-        }
-        
-        .calculator {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1001;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-        
-        .calculator.show {
-            display: block;
-        }
-        
-        .calc-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            border: none;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .calc-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .calc-btn.operator {
-            background: #667eea;
-            color: white;
-        }
-        
-        .calc-btn.number {
-            background: #f8fafc;
-            color: #1e293b;
-        }
-        
-        .calc-btn.equals {
-            background: #10b981;
-            color: white;
-        }
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-        }
-        
-        .modal-overlay.show {
-            display: block;
-        }
-        
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin: 20px 0;
-        }
-        
-        .stats-card {
-            background: linear-gradient(135deg, #ff6b6b, #ffa726);
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-        
-        .income-card {
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-        }
-        
-        .expense-card {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-        }
-        
-        .balance-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>קופה קלה – ניהול כספים יומי</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root { --brand:#6366f1; --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; }
+    html,body{ height:100%; }
+    body{ font-family: 'Heebo', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial,"Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; }
+    .glass{ background: rgba(255,255,255,0.65); backdrop-filter: blur(8px); }
+    .dark .glass{ background: rgba(17,24,39,0.55); }
+    .tab-active{ color:#111827; border-color: var(--brand); }
+    .dark .tab-active{ color:#f9fafb; }
+    .ring-brand{ box-shadow:0 0 0 3px rgba(99,102,241,0.35) }
+    .btn{ @apply px-4 py-3 rounded-2xl font-medium shadow-sm transition active:scale-[.98]; }
+    .btn-primary{ background:var(--brand); color:white; }
+    .btn-ghost{ @apply bg-transparent; }
+    .pill{ @apply text-sm px-2 py-1 rounded-full; }
+    .toast{ position: fixed; inset-inline:0; bottom: 82px; display:flex; justify-content:center; pointer-events:none; }
+    .toast > div{ pointer-events:auto; }
+    .progress{ height:10px; border-radius:999px; background:rgba(0,0,0,.08); overflow:hidden }
+    .dark .progress{ background:rgba(255,255,255,.12) }
+    .progress > span{ display:block; height:100%; background:linear-gradient(90deg, var(--brand), #22d3ee); }
+    .card{ @apply rounded-3xl p-4 shadow-md glass; }
+  </style>
 </head>
-<body class="bg-gray-50 min-h-screen transition-all duration-300">
-    <!-- Header -->
-    <header class="gradient-bg text-white p-4 shadow-lg">
-        <div class="container mx-auto">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-reverse space-x-3">
-                    <i class="fas fa-piggy-bank text-2xl"></i>
-                    <h1 class="text-2xl font-bold">MyMoney</h1>
-                </div>
-                <div class="flex items-center space-x-reverse space-x-3">
-                    <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
-                        <i id="theme-icon" class="fas fa-moon"></i>
-                    </button>
-                    <button onclick="showCalculator()" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-calculator"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+  <div id="app" class="min-h-screen flex flex-col">
+    <!-- Top Bar -->
+    <header class="sticky top-0 z-20 bg-gradient-to-b from-indigo-500/90 to-indigo-400/60 dark:from-indigo-700/70 dark:to-indigo-600/40 text-white">
+      <div class="max-w-screen-sm mx-auto px-4 py-3 flex items-center gap-3">
+        <button id="themeBtn" class="pill bg-white/20 hover:bg-white/30">🌓 מצב</button>
+        <h1 class="text-xl font-bold flex-1 text-center">קופה קלה</h1>
+        <button id="settingsBtn" class="pill bg-white/20 hover:bg-white/30">⚙️</button>
+      </div>
+      <div class="max-w-screen-sm mx-auto px-4 pb-3 -mt-2">
+        <p id="monthLabel" class="text-sm/6 opacity-90"></p>
+      </div>
     </header>
 
-    <!-- Main Container -->
-    <div class="container mx-auto p-4 max-w-6xl">
-        <!-- Balance Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="balance-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">יתרה נוכחית</h3>
-                        <p class="text-2xl font-bold" id="current-balance">₪5,240</p>
-                    </div>
-                    <i class="fas fa-wallet text-3xl opacity-70"></i>
-                </div>
+    <!-- Main Views -->
+    <main class="flex-1 max-w-screen-sm mx-auto w-full px-3 py-3 space-y-3">
+      <!-- Quick Add -->
+      <section id="view-add" class="space-y-3">
+        <div class="card">
+          <div class="flex items-center gap-2">
+            <button data-kind="expense" class="kindBtn btn flex-1 bg-rose-500/90 text-white">הוצאה</button>
+            <button data-kind="income" class="kindBtn btn flex-1 bg-emerald-500/90 text-white">הכנסה</button>
+          </div>
+          <form id="quickForm" class="mt-3 grid grid-cols-2 gap-3" autocomplete="off">
+            <div class="col-span-2">
+              <label class="block text-sm mb-1">סכום (₪)</label>
+              <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="לדוגמה: 35" required />
             </div>
-            <div class="income-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">הכנסות החודש</h3>
-                        <p class="text-2xl font-bold" id="monthly-income">₪8,500</p>
-                    </div>
-                    <i class="fas fa-arrow-up text-3xl opacity-70"></i>
-                </div>
+            <div class="col-span-1">
+              <label class="block text-sm mb-1">קטגוריה</label>
+              <select id="category" class="w-full rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand"></select>
+              <button id="addCategoryBtn" type="button" class="mt-1 text-xs text-indigo-600">➕ הוספת קטגוריה</button>
             </div>
-            <div class="expense-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">הוצאות החודש</h3>
-                        <p class="text-2xl font-bold" id="monthly-expenses">₪3,260</p>
-                    </div>
-                    <i class="fas fa-arrow-down text-3xl opacity-70"></i>
-                </div>
+            <div class="col-span-1">
+              <label class="block text-sm mb-1">תאריך</label>
+              <input id="date" type="date" class="w-full rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" />
             </div>
+            <div class="col-span-2">
+              <label class="block text-sm mb-1">תיאור (לא חובה)</label>
+              <input id="note" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="לדוגמה: קפה, נסיעה, מלגה..." />
+            </div>
+            <div class="col-span-2 flex items-center gap-2">
+              <input id="saveTemplate" type="checkbox" class="scale-125">
+              <label for="saveTemplate" class="text-sm">שמור כתבנית לחזרה מהירה</label>
+            </div>
+            <div class="col-span-2">
+              <button class="btn btn-primary w-full" type="submit">💾 שמירה מהירה</button>
+            </div>
+          </form>
         </div>
 
-        <!-- Quick Action Buttons -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <button onclick="showAddTransaction('expense')" class="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                <i class="fas fa-minus-circle ml-2"></i>
-                הוסף הוצאה
-            </button>
-            <button onclick="showAddTransaction('income')" class="bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                <i class="fas fa-plus-circle ml-2"></i>
-                הוסף הכנסה
-            </button>
+        <!-- Quick Templates -->
+        <div class="card" id="templatesCard" hidden>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold">שימוש מהיר בפעולות חוזרות</h3>
+            <button id="clearTemplates" class="text-xs text-rose-400">נקה תבניות</button>
+          </div>
+          <div id="templatesList" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <!-- Budget Overview -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <i class="fas fa-chart-pie ml-2 text-purple-600"></i>
-                סקירת תקציב
-            </h2>
-            <div id="budget-categories" class="space-y-4">
-                <!-- Budget categories will be populated by JavaScript -->
-            </div>
+        <!-- Snapshot -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="card text-center">
+            <div class="text-sm opacity-80">הכנסות בחודש</div>
+            <div id="sumIncome" class="text-xl font-bold">₪0</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-sm opacity-80">הוצאות בחודש</div>
+            <div id="sumExpense" class="text-xl font-bold">₪0</div>
+          </div>
+          <div class="card text-center">
+            <div class="text-sm opacity-80">יתרה נוכחית</div>
+            <div id="balance" class="text-xl font-bold">₪0</div>
+          </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">הוצאות לפי קטגוריות</h3>
-                <div class="chart-container">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">מגמות החודש</h3>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
-            </div>
+        <!-- Budget glance -->
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold">תקציב חודשי – מבט מהיר</h3>
+            <button class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200" data-nav="budget">ניהול תקציב</button>
+          </div>
+          <div id="budgetGlance" class="space-y-3"></div>
         </div>
+      </section>
 
-        <!-- Recent Transactions -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-history ml-2 text-blue-600"></i>
-                    עסקאות אחרונות
-                </h2>
-                <div class="flex space-x-reverse space-x-2">
-                    <input type="text" id="search-transactions" placeholder="חיפוש עסקאות..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    <button onclick="exportData('csv')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                        <i class="fas fa-download ml-1"></i>
-                        ייצוא CSV
-                    </button>
-                    <button onclick="exportData('json')" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm">
-                        <i class="fas fa-file-code ml-1"></i>
-                        ייצוא JSON
-                    </button>
-                </div>
-            </div>
-            <div id="transactions-list" class="space-y-3">
-                <!-- Transactions will be populated by JavaScript -->
-            </div>
+      <!-- Reports -->
+      <section id="view-reports" class="space-y-3 hidden">
+        <div class="card">
+          <h3 class="font-semibold mb-2">פילוח הוצאות לפי קטגוריות (החודש)</h3>
+          <canvas id="pieCats" height="200"></canvas>
         </div>
+        <div class="card">
+          <h3 class="font-semibold mb-2">מגמה יומית נטו (החודש)</h3>
+          <canvas id="lineDaily" height="200"></canvas>
+        </div>
+      </section>
 
-        <!-- Savings Goals -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-bullseye ml-2 text-green-600"></i>
-                    מטרות חיסכון
-                </h2>
-                <button onclick="addSavingsGoal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                    <i class="fas fa-plus ml-1"></i>
-                    הוסף מטרה
-                </button>
-            </div>
-            <div id="savings-goals" class="space-y-4">
-                <!-- Savings goals will be populated by JavaScript -->
-            </div>
+      <!-- Budget -->
+      <section id="view-budget" class="space-y-3 hidden">
+        <div class="card">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold">הגדרת תקציבים לפי קטגוריה</h3>
+            <button id="addBudgetRow" class="pill bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">➕ קטגוריה</button>
+          </div>
+          <div class="space-y-2" id="budgetList"></div>
+          <div class="mt-2 flex gap-2">
+            <button id="saveBudgets" class="btn btn-primary flex-1">שמירת תקציב</button>
+            <button id="resetBudgets" class="btn flex-1 bg-slate-200 dark:bg-slate-700">איפוס</button>
+          </div>
         </div>
+      </section>
+
+      <!-- History -->
+      <section id="view-history" class="space-y-3 hidden">
+        <div class="card">
+          <div class="flex gap-2 items-center">
+            <input id="search" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="חיפוש לפי תיאור/קטגוריה" />
+            <select id="filterKind" class="rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70">
+              <option value="all">הכל</option>
+              <option value="expense">הוצאות</option>
+              <option value="income">הכנסות</option>
+            </select>
+          </div>
+        </div>
+        <div class="card">
+          <div class="flex gap-2 mb-2">
+            <button id="exportCSV" class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200">📤 ייצוא CSV</button>
+            <button id="exportJSON" class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200">📤 ייצוא JSON</button>
+            <label class="pill bg-slate-200 dark:bg-slate-700 cursor-pointer">📥 ייבוא JSON
+              <input id="importJSON" type="file" accept="application/json" class="hidden" />
+            </label>
+            <button id="loadDemo" class="pill bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">נתוני הדגמה</button>
+            <button id="clearAll" class="pill bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">ניקוי הכל</button>
+          </div>
+          <ul id="historyList" class="divide-y divide-slate-200 dark:divide-slate-800"></ul>
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Nav -->
+    <nav class="sticky bottom-0 z-30 bg-white/90 dark:bg-slate-800/80 backdrop-blur border-t border-slate-200/70 dark:border-slate-700/60">
+      <div class="max-w-screen-sm mx-auto grid grid-cols-4">
+        <button data-nav="add" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1 tab-active">➕<span>הוספה</span></button>
+        <button data-nav="reports" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">📈<span>דוחות</span></button>
+        <button data-nav="budget" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">💳<span>תקציב</span></button>
+        <button data-nav="history" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">🗂️<span>היסטוריה</span></button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" hidden>
+    <div class="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-black/80">נשמר בהצלחה ✅</div>
+  </div>
+
+  <!-- Settings Modal (simple) -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/40 hidden items-end sm:items-center sm:justify-center">
+    <div class="bg-white dark:bg-slate-800 w-full sm:max-w-md p-4 rounded-t-3xl sm:rounded-3xl space-y-3">
+      <div class="flex items-center justify-between">
+        <h3 class="font-semibold">הגדרות</h3>
+        <button id="closeSettings" class="pill bg-slate-100 dark:bg-slate-700">✖</button>
+      </div>
+      <div class="flex items-center justify-between">
+        <div class="space-y-1">
+          <div class="font-medium">מצב כהה</div>
+          <div class="text-sm opacity-80">נוח לעיניים בשעות ערב</div>
+        </div>
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="darkToggle" class="sr-only peer">
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-indigo-600 relative after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:-translate-x-full"></div>
+        </label>
+      </div>
+      <div class="space-y-2">
+        <div class="text-sm opacity-80">גרסה ראשונית • אחסון מקומי בדפדפן • ייצוא CSV/JSON בעברית</div>
+      </div>
     </div>
+  </div>
 
-    <!-- Add Transaction Modal -->
-    <div id="transaction-modal" class="modal-overlay">
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md animate-bounce-in">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="modal-title" class="text-xl font-bold text-gray-900">הוסף עסקה</h3>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="transaction-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">סוג עסקה</label>
-                        <select id="transaction-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <option value="expense">הוצאה</option>
-                            <option value="income">הכנסה</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">סכום</label>
-                        <input type="number" id="transaction-amount" placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">קטגוריה</label>
-                        <select id="transaction-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <!-- Categories will be populated by JavaScript -->
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">תיאור</label>
-                        <input type="text" id="transaction-description" placeholder="תיאור העסקה" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">תאריך</label>
-                        <input type="date" id="transaction-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div class="flex space-x-reverse space-x-3">
-                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold">
-                            <i class="fas fa-save ml-2"></i>
-                            שמור
-                        </button>
-                        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-semibold">
-                            ביטול
-                        </button>
-                    </div>
-                </form>
-            </div>
+  <script>
+  // ===== State & Storage =====
+  const LS_KEYS = {
+    entries: 'kk_entries',
+    budgets: 'kk_budgets',
+    categories: 'kk_categories',
+    templates: 'kk_templates',
+    theme: 'kk_theme'
+  };
+
+  const DEFAULTS = {
+    categoriesExpense: ['מזון','בגדים','יציאות','תחבורה','קוסמטיקה','ספרים/לימודים','בילויים','שכר דירה','סלולר/אינטרנט','בריאות'],
+    categoriesIncome: ['עבודה','משפחה','מלגות','עבודות צד'],
+  };
+
+  let state = {
+    kind: 'expense', // 'expense' | 'income'
+    entries: load(LS_KEYS.entries, []),
+    budgets: load(LS_KEYS.budgets, {}),
+    categories: load(LS_KEYS.categories, { expense: DEFAULTS.categoriesExpense, income: DEFAULTS.categoriesIncome }),
+    templates: load(LS_KEYS.templates, []),
+    theme: load(LS_KEYS.theme, (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')),
+    charts: { pie: null, line: null }
+  };
+
+  if (state.theme === 'dark') document.documentElement.classList.add('dark');
+
+  // Demo data on very first run
+  if (!localStorage.getItem('kk_has_booted')) {
+    if (state.entries.length === 0) {
+      seedDemo();
+    }
+    localStorage.setItem('kk_has_booted','1');
+  }
+
+  // ===== Utilities =====
+  function load(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback }catch(e){ return fallback } }
+  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+  const fmtCurrency = (n)=> new Intl.NumberFormat('he-IL',{ style:'currency', currency:'ILS', maximumFractionDigits:2 }).format(n || 0);
+  const todayStr = ()=> new Date().toISOString().slice(0,10);
+  const sameMonth = (d, y = new Date().getFullYear(), m = new Date().getMonth()) => { const dt = new Date(d); return dt.getFullYear()===y && dt.getMonth()===m };
+  const monthName = (d=new Date())=> new Intl.DateTimeFormat('he-IL',{ month:'long', year:'numeric'}).format(d);
+
+  function toast(msg='נשמר בהצלחה ✅'){
+    const el = document.getElementById('toast');
+    el.querySelector('div').textContent = msg;
+    el.hidden = false; setTimeout(()=> el.hidden = true, 1400);
+  }
+
+  function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36) }
+
+  // ===== UI Wiring =====
+  const monthLabel = document.getElementById('monthLabel');
+  const amount = document.getElementById('amount');
+  const category = document.getElementById('category');
+  const dateEl = document.getElementById('date');
+  const note = document.getElementById('note');
+  const saveTemplate = document.getElementById('saveTemplate');
+  const quickForm = document.getElementById('quickForm');
+  const sumIncome = document.getElementById('sumIncome');
+  const sumExpense = document.getElementById('sumExpense');
+  const balance = document.getElementById('balance');
+  const budgetGlance = document.getElementById('budgetGlance');
+  const templatesCard = document.getElementById('templatesCard');
+  const templatesList = document.getElementById('templatesList');
+  const clearTemplates = document.getElementById('clearTemplates');
+
+  const search = document.getElementById('search');
+  const filterKind = document.getElementById('filterKind');
+  const historyList = document.getElementById('historyList');
+
+  const exportCSV = document.getElementById('exportCSV');
+  const exportJSON = document.getElementById('exportJSON');
+  const importJSON = document.getElementById('importJSON');
+  const loadDemoBtn = document.getElementById('loadDemo');
+  const clearAllBtn = document.getElementById('clearAll');
+
+  const budgetList = document.getElementById('budgetList');
+  const saveBudgets = document.getElementById('saveBudgets');
+  const resetBudgets = document.getElementById('resetBudgets');
+  const addBudgetRow = document.getElementById('addBudgetRow');
+
+  const themeBtn = document.getElementById('themeBtn');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsModal = document.getElementById('settingsModal');
+  const closeSettings = document.getElementById('closeSettings');
+  const darkToggle = document.getElementById('darkToggle');
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> switchView(b.dataset.nav)));
+  document.querySelectorAll('[data-nav]')
+    .forEach(b=>{ if(b.classList.contains('pill')) b.addEventListener('click',()=> switchView(b.dataset.nav)); });
+
+  // Kind toggle
+  document.querySelectorAll('.kindBtn').forEach(btn=> btn.addEventListener('click', ()=> setKind(btn.dataset.kind)));
+
+  // Category add
+  document.getElementById('addCategoryBtn').addEventListener('click', ()=>{
+    const k = state.kind;
+    const name = prompt('שם קטגוריה חדשה ('+(k==='expense'?'הוצאה':'הכנסה')+')');
+    if(!name) return;
+    if(!state.categories[k].includes(name)){
+      state.categories[k].push(name);
+      save(LS_KEYS.categories, state.categories);
+      buildCategories();
+      category.value = name;
+    }
+  });
+
+  // Quick Form
+  quickForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const amt = parseFloat(amount.value);
+    if(!amt || amt<=0) { amount.focus(); return; }
+    const entry = {
+      id: uid(),
+      date: dateEl.value || todayStr(),
+      kind: state.kind,
+      category: category.value,
+      amount: +amt.toFixed(2),
+      note: (note.value||'').trim()
+    };
+    state.entries.unshift(entry);
+    save(LS_KEYS.entries, state.entries);
+
+    if (saveTemplate.checked){
+      state.templates.unshift({ kind:entry.kind, category:entry.category, note:entry.note||'', amount: entry.amount });
+      state.templates = dedupTemplates(state.templates).slice(0,10);
+      save(LS_KEYS.templates, state.templates);
+      renderTemplates();
+    }
+
+    quickForm.reset();
+    dateEl.value = todayStr();
+    toast();
+    refreshAll();
+  });
+
+  clearTemplates.addEventListener('click', ()=>{
+    if(confirm('למחוק את כל התבניות השמורות?')){
+      state.templates = []; save(LS_KEYS.templates, state.templates); renderTemplates();
+    }
+  });
+
+  // History actions
+  search.addEventListener('input', renderHistory);
+  filterKind.addEventListener('change', renderHistory);
+
+  // Export / Import
+  exportCSV.addEventListener('click', ()=> downloadCSV());
+  exportJSON.addEventListener('click', ()=> downloadJSON());
+  importJSON.addEventListener('change', handleImportJSON);
+  loadDemoBtn.addEventListener('click', ()=> { if(confirm('לטעון נתוני הדגמה? פעולה זו תוסיף נתונים.')) { seedDemo(true); refreshAll(); }});
+  clearAllBtn.addEventListener('click', ()=>{
+    if(confirm('למחוק את כל הנתונים? (אפשר לגבות קודם ב-JSON/CSV)')){
+      state.entries=[]; save(LS_KEYS.entries, state.entries);
+      state.budgets={}; save(LS_KEYS.budgets, state.budgets);
+      toast('נוקה בהצלחה 🧹'); refreshAll();
+    }
+  });
+
+  // Budgets
+  saveBudgets.addEventListener('click', ()=>{
+    const rows = budgetList.querySelectorAll('[data-row]');
+    const next = {};
+    rows.forEach(r=>{
+      const cat = r.querySelector('input[name="cat"]').value.trim();
+      const val = parseFloat(r.querySelector('input[name="amt"]').value);
+      if(cat && val>0) next[cat] = +val.toFixed(2);
+    });
+    state.budgets = next; save(LS_KEYS.budgets, state.budgets);
+    toast('התקציב נשמר 📌'); refreshAll();
+  });
+
+  resetBudgets.addEventListener('click', ()=>{ if(confirm('לאפס תקציבים?')){ state.budgets={}; save(LS_KEYS.budgets, state.budgets); refreshAll(); }});
+  addBudgetRow.addEventListener('click', ()=> budgetList.appendChild(budgetRow('', '')));
+
+  // Theme & Settings
+  themeBtn.addEventListener('click', toggleTheme);
+  settingsBtn.addEventListener('click', ()=> settingsModal.classList.remove('hidden'));
+  closeSettings.addEventListener('click', ()=> settingsModal.classList.add('hidden'));
+  settingsModal.addEventListener('click', (e)=>{ if(e.target===settingsModal) settingsModal.classList.add('hidden') });
+  darkToggle.checked = state.theme==='dark';
+  darkToggle.addEventListener('change', toggleTheme);
+
+  function toggleTheme(){
+    document.documentElement.classList.toggle('dark');
+    state.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    save(LS_KEYS.theme, state.theme);
+  }
+
+  // ===== Renderers =====
+  function buildCategories(){
+    const list = (state.kind==='expense' ? state.categories.expense : state.categories.income);
+    category.innerHTML = list.map(c=>`<option>${c}</option>`).join('');
+  }
+
+  function setKind(k){ state.kind = k; document.querySelectorAll('.kindBtn').forEach(b=> b.classList.remove('ring-brand'));
+    document.querySelector(`.kindBtn[data-kind="${k}"]`).classList.add('ring-brand');
+    buildCategories();
+  }
+
+  function renderSnapshot(){
+    const now = new Date();
+    const monthEntries = state.entries.filter(e=> sameMonth(e.date, now.getFullYear(), now.getMonth()));
+    const totalIncome = monthEntries.filter(e=>e.kind==='income').reduce((s,e)=> s+e.amount,0);
+    const totalExpense = monthEntries.filter(e=>e.kind==='expense').reduce((s,e)=> s+e.amount,0);
+    sumIncome.textContent = fmtCurrency(totalIncome);
+    sumExpense.textContent = fmtCurrency(totalExpense);
+    balance.textContent = fmtCurrency(totalIncome-totalExpense);
+  }
+
+  function renderBudgetGlance(){
+    const now = new Date();
+    const exp = state.entries.filter(e=> e.kind==='expense' && sameMonth(e.date, now.getFullYear(), now.getMonth()));
+    const byCat = {};
+    exp.forEach(e=> byCat[e.category] = (byCat[e.category]||0) + e.amount);
+
+    const items = Object.entries(state.budgets).sort((a,b)=> (b[1]-a[1])).slice(0,6);
+    const host = budgetGlance; host.innerHTML = '';
+    if(items.length===0){ host.innerHTML = '<div class="text-sm opacity-70">לא הוגדרו תקציבים עדיין. עברי ללשונית תקציב.</div>'; return; }
+    items.forEach(([cat, limit])=>{
+      const used = byCat[cat]||0; const pct = Math.min(100, Math.round(100*used/limit));
+      const color = pct>=100? 'bg-rose-500' : pct>=80? 'bg-amber-500' : 'bg-indigo-500';
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <div class="flex justify-between text-sm mb-1"><span>${cat}</span><span>${fmtCurrency(used)} / ${fmtCurrency(limit)}</span></div>
+        <div class="progress"><span class="${color}" style="width:${pct}%;"></span></div>`;
+      host.appendChild(row);
+    });
+  }
+
+  function renderTemplates(){
+    const list = state.templates; const host = templatesList; host.innerHTML='';
+    document.getElementById('templatesCard').hidden = list.length===0;
+    list.forEach((t,i)=>{
+      const b = document.createElement('button');
+      b.className = 'pill bg-slate-100 dark:bg-slate-700 hover:bg-slate-200';
+      b.textContent = `${t.kind==='expense'?'⬇️':'⬆️'} ${t.category} – ${fmtCurrency(t.amount)}` + (t.note?` • ${t.note}`:'');
+      b.addEventListener('click',()=>{
+        setKind(t.kind); buildCategories();
+        category.value = t.category; amount.value = t.amount; note.value = t.note; dateEl.value = todayStr();
+      });
+      host.appendChild(b);
+    });
+  }
+
+  function renderHistory(){
+    const term = (search.value||'').trim();
+    const kind = filterKind.value;
+    const entries = state.entries.filter(e=>
+      (kind==='all' || e.kind===kind) &&
+      (term==='' || (e.category+" "+(e.note||'')).includes(term))
+    );
+    historyList.innerHTML = '';
+    if(entries.length===0){ historyList.innerHTML = '<li class="py-6 text-center opacity-70">אין תנועות להצגה</li>'; return; }
+    entries.forEach(e=>{
+      const li = document.createElement('li');
+      li.className = 'py-3 flex items-center gap-3';
+      li.innerHTML = `
+        <div class="w-9 h-9 grid place-items-center rounded-2xl ${e.kind==='expense'?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'}">${e.kind==='expense'?'⬇️':'⬆️'}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex justify-between items-baseline gap-2">
+            <div class="font-medium truncate">${e.category}${e.note? ' • '+escapeHtml(e.note):''}</div>
+            <div class="font-bold ${e.kind==='expense'?'text-rose-600':'text-emerald-600'}">${fmtCurrency(e.amount)}</div>
+          </div>
+          <div class="text-xs opacity-70">${new Intl.DateTimeFormat('he-IL').format(new Date(e.date))}</div>
         </div>
-    </div>
+        <div class="flex items-center gap-1">
+          <button class="pill bg-slate-100 dark:bg-slate-700" data-act="edit">עריכה</button>
+          <button class="pill bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200" data-act="del">מחיקה</button>
+        </div>`;
 
-    <!-- Calculator Modal -->
-    <div class="calculator" id="calculator">
-        <div class="bg-gray-800 text-white p-4 rounded-t-xl">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold">מחשבון</h3>
-                <button onclick="hideCalculator()" class="text-white hover:text-gray-300">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="calc-display" class="bg-black p-3 rounded text-right text-xl font-mono">0</div>
-        </div>
-        <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded-b-xl">
-            <button class="calc-btn operator" onclick="clearCalculator()">C</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('/')" >÷</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('*')">×</button>
-            <button class="calc-btn operator" onclick="deleteLast()">⌫</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('7')">7</button>
-            <button class="calc-btn number" onclick="appendToCalculator('8')">8</button>
-            <button class="calc-btn number" onclick="appendToCalculator('9')">9</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('-')">-</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('4')">4</button>
-            <button class="calc-btn number" onclick="appendToCalculator('5')">5</button>
-            <button class="calc-btn number" onclick="appendToCalculator('6')">6</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('+')">+</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('1')">1</button>
-            <button class="calc-btn number" onclick="appendToCalculator('2')">2</button>
-            <button class="calc-btn number" onclick="appendToCalculator('3')">3</button>
-            <button class="calc-btn equals" onclick="calculateResult()" rowspan="2">=</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('0')" colspan="2" style="grid-column: span 2;">0</button>
-            <button class="calc-btn number" onclick="appendToCalculator('.')">.</button>
-        </div>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
-
-    <script>
-        // Global variables
-        let transactions = [];
-        let budgetCategories = {};
-        let savingsGoals = [];
-        let isDarkMode = false;
-        let calculatorDisplay = '0';
-        let calculatorOperator = null;
-        let calculatorPrevValue = null;
-
-        // Categories configuration
-        const expenseCategories = {
-            'food': { name: 'מזון', icon: 'fas fa-utensils', color: '#ff6b6b' },
-            'clothes': { name: 'בגדים', icon: 'fas fa-tshirt', color: '#4ecdc4' },
-            'entertainment': { name: 'בילויים', icon: 'fas fa-gamepad', color: '#45b7d1' },
-            'transport': { name: 'תחבורה', icon: 'fas fa-car', color: '#96ceb4' },
-            'cosmetics': { name: 'קוסמטיקה', icon: 'fas fa-lipstick', color: '#ffeaa7' },
-            'books': { name: 'ספרים/לימודים', icon: 'fas fa-book', color: '#dda0dd' },
-            'outings': { name: 'יציאות', icon: 'fas fa-coffee', color: '#ff7675' }
-        };
-
-        const incomeCategories = {
-            'work': { name: 'עבודה', icon: 'fas fa-briefcase', color: '#00b894' },
-            'family': { name: 'משפחה', icon: 'fas fa-home', color: '#0984e3' },
-            'scholarship': { name: 'מלגות', icon: 'fas fa-graduation-cap', color: '#a29bfe' },
-            'sidejob': { name: 'עבודות צד', icon: 'fas fa-laptop', color: '#fd79a8' }
-        };
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initializeSampleData();
-            updateUI();
-            setupEventListeners();
-            document.getElementById('transaction-date').valueAsDate = new Date();
-        });
-
-        // Load data from localStorage
-        function loadData() {
-            const savedTransactions = localStorage.getItem('mymoneyTransactions');
-            const savedBudgets = localStorage.getItem('mymoneyBudgets');
-            const savedGoals = localStorage.getItem('mymoneySavingsGoals');
-            const savedTheme = localStorage.getItem('mymoneyTheme');
-
-            if (savedTransactions) {
-                transactions = JSON.parse(savedTransactions);
-            }
-
-            if (savedBudgets) {
-                budgetCategories = JSON.parse(savedBudgets);
-            }
-
-            if (savedGoals) {
-                savingsGoals = JSON.parse(savedGoals);
-            }
-
-            if (savedTheme === 'dark') {
-                toggleDarkMode();
-            }
+      li.querySelector('[data-act="del"]').addEventListener('click',()=>{
+        if(confirm('למחוק פעולה זו?')){
+          state.entries = state.entries.filter(x=> x.id!==e.id);
+          save(LS_KEYS.entries, state.entries);
+          renderHistory(); renderSnapshot(); renderBudgetGlance(); updateCharts();
         }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('mymoneyTransactions', JSON.stringify(transactions));
-            localStorage.setItem('mymoneyBudgets', JSON.stringify(budgetCategories));
-            localStorage.setItem('mymoneySavingsGoals', JSON.stringify(savingsGoals));
-        }
-
-        // Initialize sample data
-        function initializeSampleData() {
-            if (transactions.length === 0) {
-                // Sample transactions
-                const sampleTransactions = [
-                    { id: 1, type: 'income', amount: 4000, category: 'work', description: 'משכורת חלקית', date: '2024-01-15' },
-                    { id: 2, type: 'income', amount: 1500, category: 'family', description: 'כסף מההורים', date: '2024-01-10' },
-                    { id: 3, type: 'income', amount: 3000, category: 'scholarship', description: 'מלגה לימודים', date: '2024-01-05' },
-                    { id: 4, type: 'expense', amount: 450, category: 'food', description: 'קניות במרכול', date: '2024-01-20' },
-                    { id: 5, type: 'expense', amount: 280, category: 'clothes', description: 'חולצה חדשה', date: '2024-01-18' },
-                    { id: 6, type: 'expense', amount: 120, category: 'entertainment', description: 'קולנוע עם חברות', date: '2024-01-16' },
-                    { id: 7, type: 'expense', amount: 200, category: 'transport', description: 'כרטיסיות אוטובוס', date: '2024-01-14' },
-                    { id: 8, type: 'expense', amount: 350, category: 'cosmetics', description: 'מוצרי יופי', date: '2024-01-12' },
-                    { id: 9, type: 'expense', amount: 180, category: 'books', description: 'ספרי לימוד', date: '2024-01-08' },
-                    { id: 10, type: 'expense', amount: 90, category: 'outings', description: 'קפה עם חברה', date: '2024-01-22' }
-                ];
-                transactions = sampleTransactions;
-            }
-
-            if (Object.keys(budgetCategories).length === 0) {
-                // Sample budgets
-                budgetCategories = {
-                    'food': { budget: 800, spent: 450 },
-                    'clothes': { budget: 500, spent: 280 },
-                    'entertainment': { budget: 300, spent: 120 },
-                    'transport': { budget: 250, spent: 200 },
-                    'cosmetics': { budget: 400, spent: 350 },
-                    'books': { budget: 300, spent: 180 },
-                    'outings': { budget: 200, spent: 90 }
-                };
-            }
-
-            if (savingsGoals.length === 0) {
-                // Sample savings goals
-                savingsGoals = [
-                    { id: 1, name: 'נסיעה לחו"ל', target: 8000, saved: 2500, deadline: '2024-12-31' },
-                    { id: 2, name: 'מחשב נייד חדש', target: 3500, saved: 1200, deadline: '2024-06-30' }
-                ];
-            }
-
-            saveData();
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Transaction form
-            document.getElementById('transaction-form').addEventListener('submit', handleTransactionSubmit);
-            
-            // Transaction type change
-            document.getElementById('transaction-type').addEventListener('change', updateCategoryOptions);
-            
-            // Search functionality
-            document.getElementById('search-transactions').addEventListener('input', filterTransactions);
-        }
-
-        // Update UI
-        function updateUI() {
-            updateSummaryCards();
-            updateBudgetCategories();
-            updateTransactionsList();
-            updateSavingsGoals();
-            updateCharts();
-            updateCategoryOptions();
-        }
-
-        // Update summary cards
-        function updateSummaryCards() {
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-
-            let monthlyIncome = 0;
-            let monthlyExpenses = 0;
-            let currentBalance = 0;
-
-            transactions.forEach(transaction => {
-                const transactionDate = new Date(transaction.date);
-                const amount = parseFloat(transaction.amount);
-
-                if (transaction.type === 'income') {
-                    currentBalance += amount;
-                    if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
-                        monthlyIncome += amount;
-                    }
-                } else {
-                    currentBalance -= amount;
-                    if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
-                        monthlyExpenses += amount;
-                    }
-                }
-            });
-
-            document.getElementById('current-balance').textContent = `₪${currentBalance.toLocaleString()}`;
-            document.getElementById('monthly-income').textContent = `₪${monthlyIncome.toLocaleString()}`;
-            document.getElementById('monthly-expenses').textContent = `₪${monthlyExpenses.toLocaleString()}`;
-        }
-
-        // Update budget categories
-        function updateBudgetCategories() {
-            const container = document.getElementById('budget-categories');
-            container.innerHTML = '';
-
-            Object.keys(budgetCategories).forEach(categoryKey => {
-                const category = budgetCategories[categoryKey];
-                const categoryInfo = expenseCategories[categoryKey];
-                const percentage = category.budget > 0 ? (category.spent / category.budget) * 100 : 0;
-                const remaining = category.budget - category.spent;
-
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'bg-gray-50 rounded-lg p-4';
-                categoryDiv.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center">
-                            <div class="category-icon" style="background-color: ${categoryInfo.color}20;">
-                                <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">${categoryInfo.name}</h4>
-                                <p class="text-sm text-gray-600">נותר: ₪${remaining.toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="text-left">
-                            <p class="text-lg font-bold text-gray-900">₪${category.spent.toLocaleString()}</p>
-                            <p class="text-sm text-gray-600">מתוך ₪${category.budget.toLocaleString()}</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="progress-bar h-2 rounded-full ${percentage > 90 ? 'bg-red-500' : percentage > 70 ? 'bg-yellow-500' : 'bg-green-500'}" 
-                             style="width: ${Math.min(percentage, 100)}%"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">${percentage.toFixed(1)}% מהתקציב</p>
-                `;
-
-                container.appendChild(categoryDiv);
-
-                // Check for budget alerts
-                if (percentage > 80) {
-                    setTimeout(() => {
-                        showNotification(
-                            `אזהרה: התקציב של ${categoryInfo.name} מתקרב לסיום (${percentage.toFixed(1)}%)`,
-                            'warning'
-                        );
-                    }, 1000);
-                }
-            });
-        }
-
-        // Update transactions list
-        function updateTransactionsList() {
-            const container = document.getElementById('transactions-list');
-            const searchTerm = document.getElementById('search-transactions').value.toLowerCase();
-            
-            const filteredTransactions = transactions
-                .filter(transaction => 
-                    transaction.description.toLowerCase().includes(searchTerm) ||
-                    getCategoryName(transaction.category, transaction.type).toLowerCase().includes(searchTerm)
-                )
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 10);
-
-            container.innerHTML = '';
-
-            filteredTransactions.forEach(transaction => {
-                const categoryInfo = transaction.type === 'expense' ? 
-                    expenseCategories[transaction.category] : 
-                    incomeCategories[transaction.category];
-
-                const transactionDiv = document.createElement('div');
-                transactionDiv.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all';
-                transactionDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="category-icon" style="background-color: ${categoryInfo.color}20;">
-                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">${transaction.description}</h4>
-                            <p class="text-sm text-gray-600">${categoryInfo.name} • ${formatDate(transaction.date)}</p>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
-                            ${transaction.type === 'income' ? '+' : '-'}₪${transaction.amount.toLocaleString()}
-                        </p>
-                        <button onclick="deleteTransaction(${transaction.id})" class="text-xs text-gray-400 hover:text-red-500">
-                            <i class="fas fa-trash"></i> מחק
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(transactionDiv);
-            });
-        }
-
-        // Update savings goals
-        function updateSavingsGoals() {
-            const container = document.getElementById('savings-goals');
-            container.innerHTML = '';
-
-            savingsGoals.forEach(goal => {
-                const percentage = goal.target > 0 ? (goal.saved / goal.target) * 100 : 0;
-                const remaining = goal.target - goal.saved;
-                const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-
-                const goalDiv = document.createElement('div');
-                goalDiv.className = 'bg-gradient-to-r from-green-400 to-blue-500 rounded-lg p-4 text-white';
-                goalDiv.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="font-bold text-lg">${goal.name}</h4>
-                            <p class="text-sm opacity-80">${daysLeft > 0 ? `${daysLeft} ימים נותרו` : 'פג תוקף'}</p>
-                        </div>
-                        <button onclick="deleteSavingsGoal(${goal.id})" class="text-white opacity-60 hover:opacity-100">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="mb-2">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span>₪${goal.saved.toLocaleString()}</span>
-                            <span>₪${goal.target.toLocaleString()}</span>
-                        </div>
-                        <div class="w-full bg-white bg-opacity-30 rounded-full h-2">
-                            <div class="bg-white h-2 rounded-full progress-bar" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                    </div>
-                    <p class="text-xs">נותר: ₪${remaining.toLocaleString()} (${percentage.toFixed(1)}%)</p>
-                `;
-
-                container.appendChild(goalDiv);
-            });
-        }
-
-        // Update charts
-        function updateCharts() {
-            updateExpenseChart();
-            updateTrendChart();
-        }
-
-        // Update expense chart
-        function updateExpenseChart() {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            
-            // Calculate expenses by category
-            const categoryExpenses = {};
-            transactions.forEach(transaction => {
-                if (transaction.type === 'expense') {
-                    const category = transaction.category;
-                    categoryExpenses[category] = (categoryExpenses[category] || 0) + parseFloat(transaction.amount);
-                }
-            });
-
-            const labels = Object.keys(categoryExpenses).map(key => expenseCategories[key].name);
-            const data = Object.values(categoryExpenses);
-            const colors = Object.keys(categoryExpenses).map(key => expenseCategories[key].color);
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: {
-                                    family: 'Heebo'
-                                },
-                                padding: 20
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update trend chart
-        function updateTrendChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            
-            // Get last 7 days data
-            const days = [];
-            const incomeData = [];
-            const expenseData = [];
-            
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                
-                days.push(date.toLocaleDateString('he-IL', { weekday: 'short' }));
-                
-                const dayIncome = transactions
-                    .filter(t => t.type === 'income' && t.date === dateStr)
-                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-                    
-                const dayExpense = transactions
-                    .filter(t => t.type === 'expense' && t.date === dateStr)
-                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-                
-                incomeData.push(dayIncome);
-                expenseData.push(dayExpense);
-            }
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: days,
-                    datasets: [{
-                        label: 'הכנסות',
-                        data: incomeData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'הוצאות',
-                        data: expenseData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update category options
-        function updateCategoryOptions() {
-            const typeSelect = document.getElementById('transaction-type');
-            const categorySelect = document.getElementById('transaction-category');
-            
-            const type = typeSelect.value;
-            const categories = type === 'expense' ? expenseCategories : incomeCategories;
-            
-            categorySelect.innerHTML = '';
-            Object.keys(categories).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = categories[key].name;
-                categorySelect.appendChild(option);
-            });
-        }
-
-        // Show add transaction modal
-        function showAddTransaction(type) {
-            document.getElementById('transaction-type').value = type;
-            document.getElementById('modal-title').textContent = type === 'expense' ? 'הוסף הוצאה' : 'הוסף הכנסה';
-            updateCategoryOptions();
-            document.getElementById('transaction-modal').classList.add('show');
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('transaction-modal').classList.remove('show');
-            document.getElementById('transaction-form').reset();
-        }
-
-        // Handle transaction submit
-        function handleTransactionSubmit(e) {
-            e.preventDefault();
-            
-            const type = document.getElementById('transaction-type').value;
-            const amount = parseFloat(document.getElementById('transaction-amount').value);
-            const category = document.getElementById('transaction-category').value;
-            const description = document.getElementById('transaction-description').value;
-            const date = document.getElementById('transaction-date').value;
-
-            if (!amount || !description) {
-                showNotification('אנא מלא את כל השדות הנדרשים', 'error');
-                return;
-            }
-
-            const newTransaction = {
-                id: Date.now(),
-                type: type,
-                amount: amount,
-                category: category,
-                description: description,
-                date: date
-            };
-
-            transactions.push(newTransaction);
-
-            // Update budget if it's an expense
-            if (type === 'expense') {
-                if (!budgetCategories[category]) {
-                    budgetCategories[category] = { budget: 1000, spent: 0 };
-                }
-                budgetCategories[category].spent += amount;
-            }
-
-            saveData();
-            updateUI();
-            closeModal();
-            showNotification('העסקה נוספה בהצלחה!', 'success');
-        }
-
-        // Delete transaction
-        function deleteTransaction(id) {
-            if (confirm('האם אתה בטוח שברצונך למחוק את העסקה?')) {
-                const transaction = transactions.find(t => t.id === id);
-                if (transaction && transaction.type === 'expense') {
-                    budgetCategories[transaction.category].spent -= transaction.amount;
-                }
-                
-                transactions = transactions.filter(t => t.id !== id);
-                saveData();
-                updateUI();
-                showNotification('העסקה נמחקה בהצלחה', 'success');
-            }
-        }
-
-        // Filter transactions
-        function filterTransactions() {
-            updateTransactionsList();
-        }
-
-        // Add savings goal
-        function addSavingsGoal() {
-            const name = prompt('שם המטרה:');
-            const target = parseFloat(prompt('סכום יעד:'));
-            const deadline = prompt('תאריך יעד (YYYY-MM-DD):');
-
-            if (name && target && deadline) {
-                const newGoal = {
-                    id: Date.now(),
-                    name: name,
-                    target: target,
-                    saved: 0,
-                    deadline: deadline
-                };
-
-                savingsGoals.push(newGoal);
-                saveData();
-                updateSavingsGoals();
-                showNotification('מטרת החיסכון נוספה בהצלחה!', 'success');
-            }
-        }
-
-        // Delete savings goal
-        function deleteSavingsGoal(id) {
-            if (confirm('האם אתה בטוח שברצונך למחוק את מטרת החיסכון?')) {
-                savingsGoals = savingsGoals.filter(goal => goal.id !== id);
-                saveData();
-                updateSavingsGoals();
-                showNotification('מטרת החיסכון נמחקה בהצלחה', 'success');
-            }
-        }
-
-        // Export data
-        function exportData(format) {
-            const data = {
-                transactions: transactions,
-                budgets: budgetCategories,
-                savingsGoals: savingsGoals,
-                exportDate: new Date().toISOString()
-            };
-
-            let content, mimeType, filename;
-
-            if (format === 'csv') {
-                // Convert transactions to CSV
-                const csvHeaders = 'תאריך,סוג,קטגוריה,תיאור,סכום\n';
-                const csvRows = transactions.map(t => 
-                    `${t.date},${t.type === 'income' ? 'הכנסה' : 'הוצאה'},${getCategoryName(t.category, t.type)},${t.description},${t.amount}`
-                ).join('\n');
-                
-                content = csvHeaders + csvRows;
-                mimeType = 'text/csv;charset=utf-8;';
-                filename = 'my-money-data.csv';
-            } else {
-                content = JSON.stringify(data, null, 2);
-                mimeType = 'application/json;charset=utf-8;';
-                filename = 'my-money-data.json';
-            }
-
-            const blob = new Blob([content], { type: mimeType });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-
-            showNotification(`הנתונים יוצאו בהצלחה כ-${format.toUpperCase()}`, 'success');
-        }
-
-        // Toggle dark mode
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode');
-            
-            const themeIcon = document.getElementById('theme-icon');
-            themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
-            
-            localStorage.setItem('mymoneyTheme', isDarkMode ? 'dark' : 'light');
-        }
-
-        // Calculator functions
-        function showCalculator() {
-            document.getElementById('calculator').classList.add('show');
-        }
-
-        function hideCalculator() {
-            document.getElementById('calculator').classList.remove('show');
-        }
-
-        function clearCalculator() {
-            calculatorDisplay = '0';
-            calculatorOperator = null;
-            calculatorPrevValue = null;
-            updateCalculatorDisplay();
-        }
-
-        function appendToCalculator(value) {
-            if (calculatorDisplay === '0' && !isNaN(value)) {
-                calculatorDisplay = value;
-            } else {
-                calculatorDisplay += value;
-            }
-            updateCalculatorDisplay();
-        }
-
-        function deleteLast() {
-            calculatorDisplay = calculatorDisplay.length > 1 ? calculatorDisplay.slice(0, -1) : '0';
-            updateCalculatorDisplay();
-        }
-
-        function calculateResult() {
-            try {
-                const result = eval(calculatorDisplay.replace('×', '*').replace('÷', '/'));
-                calculatorDisplay = result.toString();
-                updateCalculatorDisplay();
-            } catch (error) {
-                calculatorDisplay = 'Error';
-                updateCalculatorDisplay();
-            }
-        }
-
-        function updateCalculatorDisplay() {
-            document.getElementById('calc-display').textContent = calculatorDisplay;
-        }
-
-        // Show notification
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Helper functions
-        function getCategoryName(categoryKey, type) {
-            const categories = type === 'expense' ? expenseCategories : incomeCategories;
-            return categories[categoryKey] ? categories[categoryKey].name : categoryKey;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('he-IL');
-        }
-    </script>
+      });
+      li.querySelector('[data-act="edit"]').addEventListener('click',()=> editEntry(e));
+      historyList.appendChild(li);
+    });
+  }
+
+  function editEntry(e){
+    const newAmt = prompt('סכום חדש (₪)', e.amount);
+    if(newAmt==null) return;
+    const v = parseFloat(newAmt);
+    if(!v || v<=0) return alert('סכום לא תקין');
+    e.amount = +v.toFixed(2);
+    const newNote = prompt('תיאור (אפשר להשאיר ריק)', e.note||'');
+    if(newNote!==null) e.note = newNote.trim();
+    save(LS_KEYS.entries, state.entries);
+    toast('עודכן ✔️');
+    renderHistory(); renderSnapshot(); renderBudgetGlance(); updateCharts();
+  }
+
+  function renderBudgets(){
+    budgetList.innerHTML = '';
+    const cats = Array.from(new Set([ ...state.categories.expense, ...Object.keys(state.budgets) ]));
+    cats.forEach(c=> budgetList.appendChild(budgetRow(c, state.budgets[c]||'')) );
+  }
+
+  function budgetRow(cat, amt){
+    const row = document.createElement('div'); row.dataset.row='1'; row.className='grid grid-cols-5 gap-2 items-center';
+    row.innerHTML = `
+      <input name="cat" class="col-span-3 rounded-2xl px-3 py-2 bg-white/80 dark:bg-slate-800/70" value="${cat||''}" placeholder="שם קטגוריה" />
+      <input name="amt" type="number" min="0" step="0.01" class="col-span-2 rounded-2xl px-3 py-2 bg-white/80 dark:bg-slate-800/70" value="${amt}" placeholder="תקציב חודשי (₪)" />`;
+    return row;
+  }
+
+  function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
+
+  // ===== Charts =====
+  function updateCharts(){
+    const now = new Date();
+    const month = state.entries.filter(e=> sameMonth(e.date, now.getFullYear(), now.getMonth()));
+    const exp = month.filter(e=> e.kind==='expense');
+
+    // Pie by category
+    const byCat = {};
+    exp.forEach(e=> byCat[e.category] = (byCat[e.category]||0)+e.amount);
+    const pieData = { labels: Object.keys(byCat), datasets:[{ data: Object.values(byCat) }] };
+    const pieEl = document.getElementById('pieCats');
+    state.charts.pie && state.charts.pie.destroy();
+    state.charts.pie = new Chart(pieEl, { type:'doughnut', data: pieData, options:{ plugins:{ legend:{ position:'bottom' } } } });
+
+    // Line daily net
+    const map = new Map();
+    month.forEach(e=>{
+      const d = e.date.slice(0,10);
+      const val = (e.kind==='income'? e.amount : -e.amount);
+      map.set(d, (map.get(d)||0) + val);
+    });
+    const days = Array.from(map.keys()).sort();
+    const lineData = { labels: days, datasets:[{ label:'נטו יומי', data: days.map(d=> +map.get(d).toFixed(2) ) }] };
+    const lineEl = document.getElementById('lineDaily');
+    state.charts.line && state.charts.line.destroy();
+    state.charts.line = new Chart(lineEl, { type:'line', data: lineData, options:{ scales:{ y:{ ticks:{ callback:(v)=> '₪'+v } } } } });
+  }
+
+  // ===== Export / Import =====
+  function downloadCSV(){
+    const rows = [ ['תאריך','סוג','תיאור','קטגוריה','סכום'] ];
+    state.entries.slice().reverse().forEach(e=>{
+      rows.push([ e.date, (e.kind==='expense'?'הוצאה':'הכנסה'), e.note||'', e.category, e.amount ]);
+    });
+    const csv = rows.map(r=> r.map(v=> '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    triggerDownload(url, `קופה-קלה-ייצוא-${new Date().toISOString().slice(0,7)}.csv`);
+  }
+
+  function downloadJSON(){
+    const blob = new Blob([ JSON.stringify({ entries: state.entries, budgets: state.budgets, categories: state.categories }, null, 2) ], { type:'application/json' });
+    const url = URL.createObjectURL(blob);
+    triggerDownload(url, `קופה-קלה-גיבוי-${Date.now()}.json`);
+  }
+
+  function triggerDownload(url, filename){
+    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  }
+
+  async function handleImportJSON(e){
+    const file = e.target.files[0]; if(!file) return; const text = await file.text();
+    try{
+      const obj = JSON.parse(text);
+      if(obj.entries){ state.entries = obj.entries; save(LS_KEYS.entries, state.entries); }
+      if(obj.budgets){ state.budgets = obj.budgets; save(LS_KEYS.budgets, state.budgets); }
+      if(obj.categories){ state.categories = obj.categories; save(LS_KEYS.categories, state.categories); }
+      toast('הנתונים יובאו בהצלחה');
+      refreshAll();
+    }catch(err){ alert('קובץ לא תקין'); }
+    importJSON.value = '';
+  }
+
+  // ===== Demo Seed =====
+  function seedDemo(append=false){
+    const base = [
+      {date: todayStr(), kind:'expense', category:'מזון', amount: 32.5, note:'קפה וכריך'},
+      {date: todayStr(), kind:'expense', category:'תחבורה', amount: 12.0, note:'רב קו'},
+      {date: todayStr(), kind:'income', category:'עבודה', amount: 450.0, note:'משמרת שישי'},
+      {date: todayStr(), kind:'expense', category:'בגדים', amount: 129.9, note:'טי-שירט'},
+      {date: todayStr(), kind:'expense', category:'בילויים', amount: 55.0, note:'סרט'},
+      {date: todayStr(), kind:'income', category:'משפחה', amount: 200.0, note:'עזרה מההורים'},
+    ];
+    state.entries = append ? base.concat(state.entries) : base;
+    state.budgets = { 'מזון': 900, 'תחבורה': 250, 'בגדים': 300, 'בילויים': 400, 'ספרים/לימודים': 150 };
+    save(LS_KEYS.entries, state.entries);
+    save(LS_KEYS.budgets, state.budgets);
+    save(LS_KEYS.categories, state.categories);
+    state.templates = [
+      {kind:'expense', category:'שכר דירה', amount: 1800, note:''},
+      {kind:'expense', category:'סלולר/אינטרנט', amount: 89, note:'חודשי'},
+      {kind:'income', category:'עבודה', amount: 450, note:'משמרת'},
+    ];
+    save(LS_KEYS.templates, state.templates);
+  }
+
+  function dedupTemplates(list){
+    const key = (t)=> [t.kind,t.category,t.note].join('|');
+    const seen = new Set();
+    return list.filter(t=> (seen.has(key(t))?false: (seen.add(key(t)),true)) );
+  }
+
+  // ===== View switching =====
+  function switchView(id){
+    document.querySelectorAll('main section').forEach(s=> s.classList.add('hidden'));
+    document.getElementById('view-'+id).classList.remove('hidden');
+    document.querySelectorAll('nav .tab').forEach(t=> t.classList.remove('tab-active'));
+    document.querySelector('nav .tab[data-nav="'+id+'"]').classList.add('tab-active');
+    if(id==='reports') updateCharts();
+    if(id==='budget') renderBudgets();
+    if(id==='history') renderHistory();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function refreshAll(){
+    monthLabel.textContent = 'חודש נוכחי: ' + monthName();
+    setKind(state.kind);
+    buildCategories();
+    dateEl.value = todayStr();
+    renderSnapshot();
+    renderBudgetGlance();
+    renderTemplates();
+    renderHistory();
+    if(!document.getElementById('view-reports').classList.contains('hidden')) updateCharts();
+  }
+
+  // ===== Boot =====
+  refreshAll();
+
+  </script>
 </body>
 </html>
