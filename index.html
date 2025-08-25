@@ -2,1112 +2,1482 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MyMoney - אפליקציית ניהול כספי</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>💰 ניהול הוצאות</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&display=swap');
-        
         * {
-            font-family: 'Heebo', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
-        
-        .dark-mode {
-            background-color: #1a1a2e;
-            color: #eee;
-        }
-        
-        .dark-mode .bg-white {
-            background-color: #16213e !important;
-        }
-        
-        .dark-mode .bg-gray-50 {
-            background-color: #0f172a !important;
-        }
-        
-        .dark-mode .text-gray-900 {
-            color: #eee !important;
-        }
-        
-        .dark-mode .text-gray-600 {
-            color: #cbd5e1 !important;
-        }
-        
-        .dark-mode .border-gray-300 {
-            border-color: #374151 !important;
-        }
-        
-        .gradient-bg {
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
         }
-        
-        .card-hover {
-            transition: all 0.3s ease;
+
+        .container {
+            max-width: 100%;
+            margin: 0;
+            background: rgba(255, 255, 255, 0.98);
+            min-height: 100vh;
+            border-radius: 0;
+            overflow-x: hidden;
         }
-        
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        
-        .animate-bounce-in {
-            animation: bounceIn 0.6s ease-out;
-        }
-        
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        .progress-bar {
-            transition: width 0.5s ease-in-out;
-        }
-        
-        .category-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 10px;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 15px 20px;
-            border-radius: 8px;
+
+        .header {
+            background: linear-gradient(45deg, #4CAF50, #2196F3);
             color: white;
-            font-weight: 500;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
+            padding: 20px 15px 15px 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .notification.show {
-            transform: translateX(0);
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
         }
-        
-        .notification.success {
-            background-color: #10b981;
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
         }
-        
-        .notification.warning {
-            background-color: #f59e0b;
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
         }
-        
-        .notification.error {
-            background-color: #ef4444;
+
+        .summary-card {
+            background: white;
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        
-        .calculator {
+
+        .summary-card h4 {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .summary-card .amount {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .quick-entry {
+            background: white;
+            padding: 20px 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .quick-entry h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .entry-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-row.full {
+            flex-direction: column;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        input:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-expense {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .btn-income {
+            background: linear-gradient(45deg, #4CAF50, #388e3c);
+            color: white;
+        }
+
+        .transactions-section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+            color: #333;
+        }
+
+        .filter-toggle {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .filter-bar {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .filter-bar.active {
+            display: flex;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: white;
+        }
+
+        .transaction-income {
+            border-right: 4px solid #4CAF50;
+            background: rgba(76, 175, 80, 0.03);
+        }
+
+        .transaction-expense {
+            border-right: 4px solid #f44336;
+            background: rgba(244, 67, 54, 0.03);
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .transaction-desc {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .transaction-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .amount-income {
+            color: #4CAF50;
+        }
+
+        .amount-expense {
+            color: #f44336;
+        }
+
+        .transaction-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            min-width: 50px;
+        }
+
+        .edit-btn {
+            background: #2196F3;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .tools-section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-tool {
+            background: #2196F3;
+            color: white;
+            padding: 12px 8px;
+            font-size: 13px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .ai-section {
+            background: linear-gradient(45deg, #9c27b0, #673ab7);
+            color: white;
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+
+        .ai-analysis-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-analysis {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .ai-platforms {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .ai-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Modal Styles */
+        .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1001;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-        }
-        
-        .calculator.show {
-            display: block;
-        }
-        
-        .calc-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            border: none;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .calc-btn:hover {
-            transform: scale(1.05);
-        }
-        
-        .calc-btn.operator {
-            background: #667eea;
-            color: white;
-        }
-        
-        .calc-btn.number {
-            background: #f8fafc;
-            color: #1e293b;
-        }
-        
-        .calc-btn.equals {
-            background: #10b981;
-            color: white;
-        }
-        
-        .modal-overlay {
-            position: fixed;
+            z-index: 1000;
+            right: 0;
             top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        /* Bottom spacing for mobile scrolling */
+        .bottom-spacer {
+            height: 50px;
+        }
+
+        /* Loading spinner */
+        .loading {
             display: none;
+            text-align: center;
+            padding: 20px;
         }
-        
-        .modal-overlay.show {
-            display: block;
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
         }
-        
-        @media print {
-            .no-print {
-                display: none !important;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .summary-cards {
+                gap: 8px;
+                padding: 10px;
+            }
+            
+            .summary-card {
+                padding: 12px 8px;
+            }
+            
+            .summary-card .amount {
+                font-size: 14px;
+            }
+            
+            .quick-entry, .transactions-section, .tools-section {
+                padding: 15px 10px;
+            }
+            
+            .ai-platforms {
+                grid-template-columns: 1fr;
             }
         }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin: 20px 0;
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Hide scrollbars but keep functionality */
+        .container {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
         
-        .stats-card {
-            background: linear-gradient(135deg, #ff6b6b, #ffa726);
-            color: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-        }
-        
-        .income-card {
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-        }
-        
-        .expense-card {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-        }
-        
-        .balance-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+        .container::-webkit-scrollbar {
+            display: none;
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen transition-all duration-300">
-    <!-- Header -->
-    <header class="gradient-bg text-white p-4 shadow-lg">
-        <div class="container mx-auto">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-reverse space-x-3">
-                    <i class="fas fa-piggy-bank text-2xl"></i>
-                    <h1 class="text-2xl font-bold">MyMoney</h1>
-                </div>
-                <div class="flex items-center space-x-reverse space-x-3">
-                    <button onclick="toggleDarkMode()" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
-                        <i id="theme-icon" class="fas fa-moon"></i>
-                    </button>
-                    <button onclick="showCalculator()" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all">
-                        <i class="fas fa-calculator"></i>
-                    </button>
-                </div>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 ניהול הוצאות</h1>
+            <p>פשוט, מהיר ויעיל</p>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card">
+                <h4>הכנסות</h4>
+                <div class="amount amount-income" id="totalIncome">₪0</div>
+            </div>
+            <div class="summary-card">
+                <h4>הוצאות</h4>
+                <div class="amount amount-expense" id="totalExpenses">₪0</div>
+            </div>
+            <div class="summary-card">
+                <h4>יתרה</h4>
+                <div class="amount" id="balance">₪0</div>
             </div>
         </div>
-    </header>
 
-    <!-- Main Container -->
-    <div class="container mx-auto p-4 max-w-6xl">
-        <!-- Balance Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="balance-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">יתרה נוכחית</h3>
-                        <p class="text-2xl font-bold" id="current-balance">₪5,240</p>
+        <div class="quick-entry">
+            <h3>⚡ קליטה מהירה</h3>
+            <div class="entry-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>סכום ₪</label>
+                        <input type="number" id="amount" placeholder="0.00" step="0.01" inputmode="decimal">
                     </div>
-                    <i class="fas fa-wallet text-3xl opacity-70"></i>
                 </div>
-            </div>
-            <div class="income-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">הכנסות החודש</h3>
-                        <p class="text-2xl font-bold" id="monthly-income">₪8,500</p>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>תיאור</label>
+                        <input type="text" id="description" placeholder="מה זה?">
                     </div>
-                    <i class="fas fa-arrow-up text-3xl opacity-70"></i>
                 </div>
-            </div>
-            <div class="expense-card stats-card card-hover">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-sm opacity-80">הוצאות החודש</h3>
-                        <p class="text-2xl font-bold" id="monthly-expenses">₪3,260</p>
-                    </div>
-                    <i class="fas fa-arrow-down text-3xl opacity-70"></i>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Action Buttons -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            <button onclick="showAddTransaction('expense')" class="bg-red-500 hover:bg-red-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                <i class="fas fa-minus-circle ml-2"></i>
-                הוסף הוצאה
-            </button>
-            <button onclick="showAddTransaction('income')" class="bg-green-500 hover:bg-green-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all transform hover:scale-105">
-                <i class="fas fa-plus-circle ml-2"></i>
-                הוסף הכנסה
-            </button>
-        </div>
-
-        <!-- Budget Overview -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                <i class="fas fa-chart-pie ml-2 text-purple-600"></i>
-                סקירת תקציב
-            </h2>
-            <div id="budget-categories" class="space-y-4">
-                <!-- Budget categories will be populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">הוצאות לפי קטגוריות</h3>
-                <div class="chart-container">
-                    <canvas id="expenseChart"></canvas>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl shadow-lg p-6 card-hover">
-                <h3 class="text-lg font-bold text-gray-900 mb-4">מגמות החודש</h3>
-                <div class="chart-container">
-                    <canvas id="trendChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Transactions -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-history ml-2 text-blue-600"></i>
-                    עסקאות אחרונות
-                </h2>
-                <div class="flex space-x-reverse space-x-2">
-                    <input type="text" id="search-transactions" placeholder="חיפוש עסקאות..." class="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                    <button onclick="exportData('csv')" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
-                        <i class="fas fa-download ml-1"></i>
-                        ייצוא CSV
-                    </button>
-                    <button onclick="exportData('json')" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg text-sm">
-                        <i class="fas fa-file-code ml-1"></i>
-                        ייצוא JSON
-                    </button>
-                </div>
-            </div>
-            <div id="transactions-list" class="space-y-3">
-                <!-- Transactions will be populated by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Savings Goals -->
-        <div class="bg-white rounded-xl shadow-lg p-6 mb-6 card-hover">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-900 flex items-center">
-                    <i class="fas fa-bullseye ml-2 text-green-600"></i>
-                    מטרות חיסכון
-                </h2>
-                <button onclick="addSavingsGoal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                    <i class="fas fa-plus ml-1"></i>
-                    הוסף מטרה
-                </button>
-            </div>
-            <div id="savings-goals" class="space-y-4">
-                <!-- Savings goals will be populated by JavaScript -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Transaction Modal -->
-    <div id="transaction-modal" class="modal-overlay">
-        <div class="fixed inset-0 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md animate-bounce-in">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 id="modal-title" class="text-xl font-bold text-gray-900">הוסף עסקה</h3>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                
-                <form id="transaction-form" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">סוג עסקה</label>
-                        <select id="transaction-type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <option value="expense">הוצאה</option>
-                            <option value="income">הכנסה</option>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>קטגוריה</label>
+                        <select id="category">
+                            <option value="שונות">שונות</option>
+                            <option value="מזון">🍽️ מזון</option>
+                            <option value="תחבורה">🚗 תחבורה</option>
+                            <option value="בילויים">🎬 בילויים</option>
+                            <option value="שכירות">🏠 שכירות</option>
+                            <option value="משכורת">💼 משכורת</option>
+                            <option value="השקעות">📈 השקעות</option>
+                            <option value="קניות">🛒 קניות</option>
+                            <option value="בריאות">⚕️ בריאות</option>
                         </select>
                     </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">סכום</label>
-                        <input type="number" id="transaction-amount" placeholder="0.00" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">קטגוריה</label>
-                        <select id="transaction-category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                            <!-- Categories will be populated by JavaScript -->
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">תיאור</label>
-                        <input type="text" id="transaction-description" placeholder="תיאור העסקה" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">תאריך</label>
-                        <input type="date" id="transaction-date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    </div>
-                    
-                    <div class="flex space-x-reverse space-x-3">
-                        <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-semibold">
-                            <i class="fas fa-save ml-2"></i>
-                            שמור
-                        </button>
-                        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded-lg font-semibold">
-                            ביטול
-                        </button>
-                    </div>
-                </form>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-expense" onclick="addTransactionWithDraft('expense')">➖ הוצאה</button>
+                    <button class="btn btn-income" onclick="addTransactionWithDraft('income')">➕ הכנסה</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="transactions-section">
+            <div class="section-header">
+                <h3>📊 תנועות</h3>
+                <button class="filter-toggle" onclick="toggleFilters()">🔍 סינון</button>
+            </div>
+            
+            <div class="filter-bar" id="filterBar">
+                <select id="filterType">
+                    <option value="">כל התנועות</option>
+                    <option value="income">הכנסות</option>
+                    <option value="expense">הוצאות</option>
+                </select>
+                <select id="filterCategory">
+                    <option value="">כל הקטגוריות</option>
+                </select>
+                <input type="month" id="filterMonth">
+            </div>
+            
+            <div id="transactionsList"></div>
+            <div class="loading" id="loadingTransactions">
+                <div class="spinner"></div>
+                <p>טוען תנועות...</p>
+            </div>
+        </div>
+
+        <div class="tools-section">
+            <h3>🛠️ כלים</h3>
+            <div class="tools-grid">
+                <button class="btn-tool" onclick="exportToCSV()">📥 גיבוי CSV</button>
+                <button class="btn-tool" onclick="showMonthlyReport()">📊 דוח חודשי</button>
+                <button class="btn-tool" onclick="showCategoryReport()">🏷️ דוח קטגוריות</button>
+                <button class="btn-tool" onclick="clearAllData()">🗑️ נקה הכל</button>
+            </div>
+        </div>
+
+        <div class="ai-section">
+            <h3>🤖 ניתוח AI מתקדם</h3>
+            <p>בחר סוג ניתוח:</p>
+            
+            <div class="ai-analysis-buttons">
+                <button class="btn-analysis" onclick="generateQuickAnalysis()">⚡ ניתוח מהיר</button>
+                <button class="btn-analysis" onclick="generateDeepAnalysis()">🔍 ניתוח עומק</button>
+            </div>
+
+            <p>העתק ושלח לצ'אטבוט:</p>
+            <div class="ai-platforms">
+                <a href="#" class="ai-btn" onclick="openAI('claude')">Claude</a>
+                <a href="#" class="ai-btn" onclick="openAI('chatgpt')">ChatGPT</a>
+                <a href="#" class="ai-btn" onclick="openAI('gemini')">Gemini</a>
+                <a href="#" class="ai-btn" onclick="openAI('cohere')">Cohere</a>
+                <a href="#" class="ai-btn" onclick="openAI('perplexity')">Perplexity</a>
+            </div>
+        </div>
+
+        <div class="bottom-spacer"></div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>עריכת תנועה</h3>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="entry-form">
+                <div class="form-group">
+                    <label>סכום ₪</label>
+                    <input type="number" id="editAmount" step="0.01" inputmode="decimal">
+                </div>
+                <div class="form-group">
+                    <label>תיאור</label>
+                    <input type="text" id="editDescription">
+                </div>
+                <div class="form-group">
+                    <label>קטגוריה</label>
+                    <select id="editCategory">
+                        <option value="שונות">שונות</option>
+                        <option value="מזון">🍽️ מזון</option>
+                        <option value="תחבורה">🚗 תחבורה</option>
+                        <option value="בילויים">🎬 בילויים</option>
+                        <option value="שכירות">🏠 שכירות</option>
+                        <option value="משכורת">💼 משכורת</option>
+                        <option value="השקעות">📈 השקעות</option>
+                        <option value="קניות">🛒 קניות</option>
+                        <option value="בריאות">⚕️ בריאות</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תאריך</label>
+                    <input type="datetime-local" id="editDate">
+                </div>
+                <button class="btn btn-income" onclick="saveEdit()">💾 שמור</button>
             </div>
         </div>
     </div>
-
-    <!-- Calculator Modal -->
-    <div class="calculator" id="calculator">
-        <div class="bg-gray-800 text-white p-4 rounded-t-xl">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold">מחשבון</h3>
-                <button onclick="hideCalculator()" class="text-white hover:text-gray-300">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div id="calc-display" class="bg-black p-3 rounded text-right text-xl font-mono">0</div>
-        </div>
-        <div class="grid grid-cols-4 gap-2 p-4 bg-gray-100 rounded-b-xl">
-            <button class="calc-btn operator" onclick="clearCalculator()">C</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('/')" >÷</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('*')">×</button>
-            <button class="calc-btn operator" onclick="deleteLast()">⌫</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('7')">7</button>
-            <button class="calc-btn number" onclick="appendToCalculator('8')">8</button>
-            <button class="calc-btn number" onclick="appendToCalculator('9')">9</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('-')">-</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('4')">4</button>
-            <button class="calc-btn number" onclick="appendToCalculator('5')">5</button>
-            <button class="calc-btn number" onclick="appendToCalculator('6')">6</button>
-            <button class="calc-btn operator" onclick="appendToCalculator('+')">+</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('1')">1</button>
-            <button class="calc-btn number" onclick="appendToCalculator('2')">2</button>
-            <button class="calc-btn number" onclick="appendToCalculator('3')">3</button>
-            <button class="calc-btn equals" onclick="calculateResult()" rowspan="2">=</button>
-            
-            <button class="calc-btn number" onclick="appendToCalculator('0')" colspan="2" style="grid-column: span 2;">0</button>
-            <button class="calc-btn number" onclick="appendToCalculator('.')">.</button>
-        </div>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
 
     <script>
-        // Global variables
-        let transactions = [];
-        let budgetCategories = {};
-        let savingsGoals = [];
-        let isDarkMode = false;
-        let calculatorDisplay = '0';
-        let calculatorOperator = null;
-        let calculatorPrevValue = null;
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let currentEditId = null;
+        let currentAnalysisData = '';
 
-        // Categories configuration
-        const expenseCategories = {
-            'food': { name: 'מזון', icon: 'fas fa-utensils', color: '#ff6b6b' },
-            'clothes': { name: 'בגדים', icon: 'fas fa-tshirt', color: '#4ecdc4' },
-            'entertainment': { name: 'בילויים', icon: 'fas fa-gamepad', color: '#45b7d1' },
-            'transport': { name: 'תחבורה', icon: 'fas fa-car', color: '#96ceb4' },
-            'cosmetics': { name: 'קוסמטיקה', icon: 'fas fa-lipstick', color: '#ffeaa7' },
-            'books': { name: 'ספרים/לימודים', icon: 'fas fa-book', color: '#dda0dd' },
-            'outings': { name: 'יציאות', icon: 'fas fa-coffee', color: '#ff7675' }
-        };
-
-        const incomeCategories = {
-            'work': { name: 'עבודה', icon: 'fas fa-briefcase', color: '#00b894' },
-            'family': { name: 'משפחה', icon: 'fas fa-home', color: '#0984e3' },
-            'scholarship': { name: 'מלגות', icon: 'fas fa-graduation-cap', color: '#a29bfe' },
-            'sidejob': { name: 'עבודות צד', icon: 'fas fa-laptop', color: '#fd79a8' }
-        };
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            loadData();
-            initializeSampleData();
-            updateUI();
-            setupEventListeners();
-            document.getElementById('transaction-date').valueAsDate = new Date();
-        });
-
-        // Load data from localStorage
-        function loadData() {
-            const savedTransactions = localStorage.getItem('mymoneyTransactions');
-            const savedBudgets = localStorage.getItem('mymoneyBudgets');
-            const savedGoals = localStorage.getItem('mymoneySavingsGoals');
-            const savedTheme = localStorage.getItem('mymoneyTheme');
-
-            if (savedTransactions) {
-                transactions = JSON.parse(savedTransactions);
-            }
-
-            if (savedBudgets) {
-                budgetCategories = JSON.parse(savedBudgets);
-            }
-
-            if (savedGoals) {
-                savingsGoals = JSON.parse(savedGoals);
-            }
-
-            if (savedTheme === 'dark') {
-                toggleDarkMode();
-            }
-        }
-
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('mymoneyTransactions', JSON.stringify(transactions));
-            localStorage.setItem('mymoneyBudgets', JSON.stringify(budgetCategories));
-            localStorage.setItem('mymoneySavingsGoals', JSON.stringify(savingsGoals));
-        }
-
-        // Initialize sample data
-        function initializeSampleData() {
-            if (transactions.length === 0) {
-                // Sample transactions
-                const sampleTransactions = [
-                    { id: 1, type: 'income', amount: 4000, category: 'work', description: 'משכורת חלקית', date: '2024-01-15' },
-                    { id: 2, type: 'income', amount: 1500, category: 'family', description: 'כסף מההורים', date: '2024-01-10' },
-                    { id: 3, type: 'income', amount: 3000, category: 'scholarship', description: 'מלגה לימודים', date: '2024-01-05' },
-                    { id: 4, type: 'expense', amount: 450, category: 'food', description: 'קניות במרכול', date: '2024-01-20' },
-                    { id: 5, type: 'expense', amount: 280, category: 'clothes', description: 'חולצה חדשה', date: '2024-01-18' },
-                    { id: 6, type: 'expense', amount: 120, category: 'entertainment', description: 'קולנוע עם חברות', date: '2024-01-16' },
-                    { id: 7, type: 'expense', amount: 200, category: 'transport', description: 'כרטיסיות אוטובוס', date: '2024-01-14' },
-                    { id: 8, type: 'expense', amount: 350, category: 'cosmetics', description: 'מוצרי יופי', date: '2024-01-12' },
-                    { id: 9, type: 'expense', amount: 180, category: 'books', description: 'ספרי לימוד', date: '2024-01-08' },
-                    { id: 10, type: 'expense', amount: 90, category: 'outings', description: 'קפה עם חברה', date: '2024-01-22' }
-                ];
-                transactions = sampleTransactions;
-            }
-
-            if (Object.keys(budgetCategories).length === 0) {
-                // Sample budgets
-                budgetCategories = {
-                    'food': { budget: 800, spent: 450 },
-                    'clothes': { budget: 500, spent: 280 },
-                    'entertainment': { budget: 300, spent: 120 },
-                    'transport': { budget: 250, spent: 200 },
-                    'cosmetics': { budget: 400, spent: 350 },
-                    'books': { budget: 300, spent: 180 },
-                    'outings': { budget: 200, spent: 90 }
-                };
-            }
-
-            if (savingsGoals.length === 0) {
-                // Sample savings goals
-                savingsGoals = [
-                    { id: 1, name: 'נסיעה לחו"ל', target: 8000, saved: 2500, deadline: '2024-12-31' },
-                    { id: 2, name: 'מחשב נייד חדש', target: 3500, saved: 1200, deadline: '2024-06-30' }
-                ];
-            }
-
-            saveData();
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Transaction form
-            document.getElementById('transaction-form').addEventListener('submit', handleTransactionSubmit);
+        // Initialize the app safely with multiple checks
+        function safeInitialize() {
+            console.log('Starting safe initialization...');
             
-            // Transaction type change
-            document.getElementById('transaction-type').addEventListener('change', updateCategoryOptions);
-            
-            // Search functionality
-            document.getElementById('search-transactions').addEventListener('input', filterTransactions);
-        }
-
-        // Update UI
-        function updateUI() {
-            updateSummaryCards();
-            updateBudgetCategories();
-            updateTransactionsList();
-            updateSavingsGoals();
-            updateCharts();
-            updateCategoryOptions();
-        }
-
-        // Update summary cards
-        function updateSummaryCards() {
-            const currentDate = new Date();
-            const currentMonth = currentDate.getMonth();
-            const currentYear = currentDate.getFullYear();
-
-            let monthlyIncome = 0;
-            let monthlyExpenses = 0;
-            let currentBalance = 0;
-
-            transactions.forEach(transaction => {
-                const transactionDate = new Date(transaction.date);
-                const amount = parseFloat(transaction.amount);
-
-                if (transaction.type === 'income') {
-                    currentBalance += amount;
-                    if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
-                        monthlyIncome += amount;
-                    }
-                } else {
-                    currentBalance -= amount;
-                    if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
-                        monthlyExpenses += amount;
-                    }
-                }
-            });
-
-            document.getElementById('current-balance').textContent = `₪${currentBalance.toLocaleString()}`;
-            document.getElementById('monthly-income').textContent = `₪${monthlyIncome.toLocaleString()}`;
-            document.getElementById('monthly-expenses').textContent = `₪${monthlyExpenses.toLocaleString()}`;
-        }
-
-        // Update budget categories
-        function updateBudgetCategories() {
-            const container = document.getElementById('budget-categories');
-            container.innerHTML = '';
-
-            Object.keys(budgetCategories).forEach(categoryKey => {
-                const category = budgetCategories[categoryKey];
-                const categoryInfo = expenseCategories[categoryKey];
-                const percentage = category.budget > 0 ? (category.spent / category.budget) * 100 : 0;
-                const remaining = category.budget - category.spent;
-
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'bg-gray-50 rounded-lg p-4';
-                categoryDiv.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center">
-                            <div class="category-icon" style="background-color: ${categoryInfo.color}20;">
-                                <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900">${categoryInfo.name}</h4>
-                                <p class="text-sm text-gray-600">נותר: ₪${remaining.toLocaleString()}</p>
-                            </div>
-                        </div>
-                        <div class="text-left">
-                            <p class="text-lg font-bold text-gray-900">₪${category.spent.toLocaleString()}</p>
-                            <p class="text-sm text-gray-600">מתוך ₪${category.budget.toLocaleString()}</p>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="progress-bar h-2 rounded-full ${percentage > 90 ? 'bg-red-500' : percentage > 70 ? 'bg-yellow-500' : 'bg-green-500'}" 
-                             style="width: ${Math.min(percentage, 100)}%"></div>
-                    </div>
-                    <p class="text-xs text-gray-500 mt-1">${percentage.toFixed(1)}% מהתקציב</p>
-                `;
-
-                container.appendChild(categoryDiv);
-
-                // Check for budget alerts
-                if (percentage > 80) {
-                    setTimeout(() => {
-                        showNotification(
-                            `אזהרה: התקציב של ${categoryInfo.name} מתקרב לסיום (${percentage.toFixed(1)}%)`,
-                            'warning'
-                        );
-                    }, 1000);
-                }
-            });
-        }
-
-        // Update transactions list
-        function updateTransactionsList() {
-            const container = document.getElementById('transactions-list');
-            const searchTerm = document.getElementById('search-transactions').value.toLowerCase();
-            
-            const filteredTransactions = transactions
-                .filter(transaction => 
-                    transaction.description.toLowerCase().includes(searchTerm) ||
-                    getCategoryName(transaction.category, transaction.type).toLowerCase().includes(searchTerm)
-                )
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 10);
-
-            container.innerHTML = '';
-
-            filteredTransactions.forEach(transaction => {
-                const categoryInfo = transaction.type === 'expense' ? 
-                    expenseCategories[transaction.category] : 
-                    incomeCategories[transaction.category];
-
-                const transactionDiv = document.createElement('div');
-                transactionDiv.className = 'flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all';
-                transactionDiv.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="category-icon" style="background-color: ${categoryInfo.color}20;">
-                            <i class="${categoryInfo.icon}" style="color: ${categoryInfo.color};"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900">${transaction.description}</h4>
-                            <p class="text-sm text-gray-600">${categoryInfo.name} • ${formatDate(transaction.date)}</p>
-                        </div>
-                    </div>
-                    <div class="text-left">
-                        <p class="text-lg font-bold ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
-                            ${transaction.type === 'income' ? '+' : '-'}₪${transaction.amount.toLocaleString()}
-                        </p>
-                        <button onclick="deleteTransaction(${transaction.id})" class="text-xs text-gray-400 hover:text-red-500">
-                            <i class="fas fa-trash"></i> מחק
-                        </button>
-                    </div>
-                `;
-
-                container.appendChild(transactionDiv);
-            });
-        }
-
-        // Update savings goals
-        function updateSavingsGoals() {
-            const container = document.getElementById('savings-goals');
-            container.innerHTML = '';
-
-            savingsGoals.forEach(goal => {
-                const percentage = goal.target > 0 ? (goal.saved / goal.target) * 100 : 0;
-                const remaining = goal.target - goal.saved;
-                const daysLeft = Math.ceil((new Date(goal.deadline) - new Date()) / (1000 * 60 * 60 * 24));
-
-                const goalDiv = document.createElement('div');
-                goalDiv.className = 'bg-gradient-to-r from-green-400 to-blue-500 rounded-lg p-4 text-white';
-                goalDiv.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <div>
-                            <h4 class="font-bold text-lg">${goal.name}</h4>
-                            <p class="text-sm opacity-80">${daysLeft > 0 ? `${daysLeft} ימים נותרו` : 'פג תוקף'}</p>
-                        </div>
-                        <button onclick="deleteSavingsGoal(${goal.id})" class="text-white opacity-60 hover:opacity-100">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="mb-2">
-                        <div class="flex justify-between text-sm mb-1">
-                            <span>₪${goal.saved.toLocaleString()}</span>
-                            <span>₪${goal.target.toLocaleString()}</span>
-                        </div>
-                        <div class="w-full bg-white bg-opacity-30 rounded-full h-2">
-                            <div class="bg-white h-2 rounded-full progress-bar" style="width: ${Math.min(percentage, 100)}%"></div>
-                        </div>
-                    </div>
-                    <p class="text-xs">נותר: ₪${remaining.toLocaleString()} (${percentage.toFixed(1)}%)</p>
-                `;
-
-                container.appendChild(goalDiv);
-            });
-        }
-
-        // Update charts
-        function updateCharts() {
-            updateExpenseChart();
-            updateTrendChart();
-        }
-
-        // Update expense chart
-        function updateExpenseChart() {
-            const ctx = document.getElementById('expenseChart').getContext('2d');
-            
-            // Calculate expenses by category
-            const categoryExpenses = {};
-            transactions.forEach(transaction => {
-                if (transaction.type === 'expense') {
-                    const category = transaction.category;
-                    categoryExpenses[category] = (categoryExpenses[category] || 0) + parseFloat(transaction.amount);
-                }
-            });
-
-            const labels = Object.keys(categoryExpenses).map(key => expenseCategories[key].name);
-            const data = Object.values(categoryExpenses);
-            const colors = Object.keys(categoryExpenses).map(key => expenseCategories[key].color);
-
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 2,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: {
-                                    family: 'Heebo'
-                                },
-                                padding: 20
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // Update trend chart
-        function updateTrendChart() {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            
-            // Get last 7 days data
-            const days = [];
-            const incomeData = [];
-            const expenseData = [];
-            
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
+            // Wait for all elements to be ready
+            const checkElements = () => {
+                const requiredElements = ['amount', 'description', 'category', 'totalIncome', 'totalExpenses', 'balance', 'transactionsList'];
+                const missing = requiredElements.filter(id => !document.getElementById(id));
                 
-                days.push(date.toLocaleDateString('he-IL', { weekday: 'short' }));
-                
-                const dayIncome = transactions
-                    .filter(t => t.type === 'income' && t.date === dateStr)
-                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
+                if (missing.length > 0) {
+                    console.log('Missing elements:', missing);
+                    return false;
+                }
+                return true;
+            };
+
+            const initialize = () => {
+                if (!checkElements()) {
+                    console.log('Elements not ready, retrying...');
+                    setTimeout(initialize, 100);
+                    return;
+                }
+
+                try {
+                    console.log('All elements ready, initializing...');
                     
-                const dayExpense = transactions
-                    .filter(t => t.type === 'expense' && t.date === dateStr)
-                    .reduce((sum, t) => sum + parseFloat(t.amount), 0);
-                
-                incomeData.push(dayIncome);
-                expenseData.push(dayExpense);
-            }
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: days,
-                    datasets: [{
-                        label: 'הכנסות',
-                        data: incomeData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'הוצאות',
-                        data: expenseData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                font: {
-                                    family: 'Heebo'
-                                }
-                            }
-                        }
+                    // Set current date safely
+                    const dateField = document.getElementById('date');
+                    if (dateField) {
+                        const now = new Date();
+                        const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+                        dateField.value = localDateTime.toISOString().slice(0, 16);
                     }
+                    
+                    updateDisplay();
+                    updateFilters();
+                    
+                    // Auto-focus amount field for quick entry
+                    setTimeout(() => {
+                        const amountField = document.getElementById('amount');
+                        if (amountField) {
+                            amountField.focus();
+                            console.log('Amount field focused');
+                        }
+                    }, 200);
+
+                    // Restore draft safely
+                    try {
+                        const draft = JSON.parse(localStorage.getItem('draft') || '{}');
+                        if (draft.amount) {
+                            const amountField = document.getElementById('amount');
+                            if (amountField) amountField.value = draft.amount;
+                        }
+                        if (draft.description) {
+                            const descField = document.getElementById('description');
+                            if (descField) descField.value = draft.description;
+                        }
+                        if (draft.category) {
+                            const catField = document.getElementById('category');
+                            if (catField) catField.value = draft.category;
+                        }
+                        console.log('Draft restored successfully');
+                    } catch (draftError) {
+                        console.warn('Draft restore error:', draftError);
+                    }
+
+                    // Initialize draft saving
+                    setTimeout(initializeDraftSaving, 500);
+                    
+                    console.log('Initialization completed successfully!');
+                } catch (error) {
+                    console.error('Initialization error:', error);
+                    // Try again after a longer delay
+                    setTimeout(initialize, 500);
                 }
-            });
+            };
+
+            initialize();
         }
 
-        // Update category options
-        function updateCategoryOptions() {
-            const typeSelect = document.getElementById('transaction-type');
-            const categorySelect = document.getElementById('transaction-category');
-            
-            const type = typeSelect.value;
-            const categories = type === 'expense' ? expenseCategories : incomeCategories;
-            
-            categorySelect.innerHTML = '';
-            Object.keys(categories).forEach(key => {
-                const option = document.createElement('option');
-                option.value = key;
-                option.textContent = categories[key].name;
-                categorySelect.appendChild(option);
-            });
+        // Start initialization when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', safeInitialize);
+        } else {
+            safeInitialize();
         }
 
-        // Show add transaction modal
-        function showAddTransaction(type) {
-            document.getElementById('transaction-type').value = type;
-            document.getElementById('modal-title').textContent = type === 'expense' ? 'הוסף הוצאה' : 'הוסף הכנסה';
-            updateCategoryOptions();
-            document.getElementById('transaction-modal').classList.add('show');
+        function setCurrentDateTime() {
+            const dateField = document.getElementById('date');
+            if (dateField) {
+                const now = new Date();
+                const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+                dateField.value = localDateTime.toISOString().slice(0, 16);
+            }
         }
 
-        // Close modal
-        function closeModal() {
-            document.getElementById('transaction-modal').classList.remove('show');
-            document.getElementById('transaction-form').reset();
-        }
+        function addTransaction(type) {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
 
-        // Handle transaction submit
-        function handleTransactionSubmit(e) {
-            e.preventDefault();
-            
-            const type = document.getElementById('transaction-type').value;
-            const amount = parseFloat(document.getElementById('transaction-amount').value);
-            const category = document.getElementById('transaction-category').value;
-            const description = document.getElementById('transaction-description').value;
-            const date = document.getElementById('transaction-date').value;
-
-            if (!amount || !description) {
-                showNotification('אנא מלא את כל השדות הנדרשים', 'error');
+            if (!amount || amount <= 0) {
+                showAlert('אנא הכנס סכום תקין');
+                document.getElementById('amount').focus();
                 return;
             }
 
-            const newTransaction = {
+            if (!description.trim()) {
+                showAlert('אנא הכנס תיאור');
+                document.getElementById('description').focus();
+                return;
+            }
+
+            const now = new Date();
+            const transaction = {
                 id: Date.now(),
                 type: type,
-                amount: amount,
+                amount: Math.abs(amount),
+                description: description.trim(),
                 category: category,
-                description: description,
-                date: date
+                date: now.toISOString()
             };
 
-            transactions.push(newTransaction);
-
-            // Update budget if it's an expense
-            if (type === 'expense') {
-                if (!budgetCategories[category]) {
-                    budgetCategories[category] = { budget: 1000, spent: 0 };
-                }
-                budgetCategories[category].spent += amount;
-            }
-
-            saveData();
-            updateUI();
-            closeModal();
-            showNotification('העסקה נוספה בהצלחה!', 'success');
+            transactions.unshift(transaction);
+            saveTransactions();
+            updateDisplay();
+            clearForm();
+            
+            // Success feedback
+            showAlert(type === 'income' ? '✅ הכנסה נקלטה!' : '✅ הוצאה נקלטה!');
+            
+            // Auto-focus for next entry
+            setTimeout(() => document.getElementById('amount').focus(), 100);
         }
 
-        // Delete transaction
-        function deleteTransaction(id) {
-            if (confirm('האם אתה בטוח שברצונך למחוק את העסקה?')) {
-                const transaction = transactions.find(t => t.id === id);
-                if (transaction && transaction.type === 'expense') {
-                    budgetCategories[transaction.category].spent -= transaction.amount;
-                }
-                
-                transactions = transactions.filter(t => t.id !== id);
-                saveData();
-                updateUI();
-                showNotification('העסקה נמחקה בהצלחה', 'success');
-            }
+        function clearForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('category').value = 'שונות';
         }
 
-        // Filter transactions
-        function filterTransactions() {
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function updateDisplay() {
+            updateSummary();
             updateTransactionsList();
         }
 
-        // Add savings goal
-        function addSavingsGoal() {
-            const name = prompt('שם המטרה:');
-            const target = parseFloat(prompt('סכום יעד:'));
-            const deadline = prompt('תאריך יעד (YYYY-MM-DD):');
+        function updateSummary() {
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const balance = income - expenses;
 
-            if (name && target && deadline) {
-                const newGoal = {
-                    id: Date.now(),
-                    name: name,
-                    target: target,
-                    saved: 0,
-                    deadline: deadline
-                };
-
-                savingsGoals.push(newGoal);
-                saveData();
-                updateSavingsGoals();
-                showNotification('מטרת החיסכון נוספה בהצלחה!', 'success');
-            }
+            document.getElementById('totalIncome').textContent = `₪${formatNumber(income)}`;
+            document.getElementById('totalExpenses').textContent = `₪${formatNumber(expenses)}`;
+            document.getElementById('balance').textContent = `₪${formatNumber(balance)}`;
+            document.getElementById('balance').className = `amount ${balance >= 0 ? 'amount-income' : 'amount-expense'}`;
         }
 
-        // Delete savings goal
-        function deleteSavingsGoal(id) {
-            if (confirm('האם אתה בטוח שברצונך למחוק את מטרת החיסכון?')) {
-                savingsGoals = savingsGoals.filter(goal => goal.id !== id);
-                saveData();
-                updateSavingsGoals();
-                showNotification('מטרת החיסכון נמחקה בהצלחה', 'success');
-            }
+        function formatNumber(num) {
+            return num.toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
         }
 
-        // Export data
-        function exportData(format) {
-            const data = {
-                transactions: transactions,
-                budgets: budgetCategories,
-                savingsGoals: savingsGoals,
-                exportDate: new Date().toISOString()
-            };
+        function updateTransactionsList() {
+            const list = document.getElementById('transactionsList');
+            const typeFilter = document.getElementById('filterType').value;
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const monthFilter = document.getElementById('filterMonth').value;
 
-            let content, mimeType, filename;
+            let filtered = transactions;
 
-            if (format === 'csv') {
-                // Convert transactions to CSV
-                const csvHeaders = 'תאריך,סוג,קטגוריה,תיאור,סכום\n';
-                const csvRows = transactions.map(t => 
-                    `${t.date},${t.type === 'income' ? 'הכנסה' : 'הוצאה'},${getCategoryName(t.category, t.type)},${t.description},${t.amount}`
-                ).join('\n');
+            if (typeFilter) {
+                filtered = filtered.filter(t => t.type === typeFilter);
+            }
+            if (categoryFilter) {
+                filtered = filtered.filter(t => t.category === categoryFilter);
+            }
+            if (monthFilter) {
+                filtered = filtered.filter(t => t.date.startsWith(monthFilter));
+            }
+
+            // Show only last 50 transactions for performance
+            const displayed = filtered.slice(0, 50);
+
+            list.innerHTML = displayed.map(transaction => {
+                const date = new Date(transaction.date);
+                const dateStr = date.toLocaleDateString('he-IL');
+                const timeStr = date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
                 
-                content = csvHeaders + csvRows;
-                mimeType = 'text/csv;charset=utf-8;';
-                filename = 'my-money-data.csv';
-            } else {
-                content = JSON.stringify(data, null, 2);
-                mimeType = 'application/json;charset=utf-8;';
-                filename = 'my-money-data.json';
+                return `
+                <div class="transaction-item transaction-${transaction.type}">
+                    <div class="transaction-details">
+                        <div class="transaction-amount amount-${transaction.type}">
+                            ${transaction.type === 'income' ? '+' : '-'}₪${formatNumber(transaction.amount)}
+                        </div>
+                        <div class="transaction-desc">${transaction.description}</div>
+                        <div class="transaction-meta">${transaction.category} • ${dateStr} ${timeStr}</div>
+                    </div>
+                    <div class="transaction-actions">
+                        <button class="action-btn edit-btn" onclick="editTransaction(${transaction.id})">✏️</button>
+                        <button class="action-btn delete-btn" onclick="deleteTransaction(${transaction.id})">🗑️</button>
+                    </div>
+                </div>
+            `}).join('');
+
+            if (filtered.length > 50) {
+                list.innerHTML += `<div style="text-align: center; padding: 15px; color: #666;">מציג 50 תנועות מתוך ${filtered.length}</div>`;
+            }
+        }
+
+        function updateFilters() {
+            const categoryFilter = document.getElementById('filterCategory');
+            if (!categoryFilter) return;
+            
+            const categories = [...new Set(transactions.map(t => t.category))];
+            categoryFilter.innerHTML = '<option value="">כל הקטגוריות</option>' + 
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            // Add event listeners safely
+            ['filterType', 'filterCategory', 'filterMonth'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', updateTransactionsList);
+                }
+            });
+        }
+
+        function toggleFilters() {
+            const filterBar = document.getElementById('filterBar');
+            filterBar.classList.toggle('active');
+        }
+
+        function editTransaction(id) {
+            const transaction = transactions.find(t => t.id === id);
+            if (!transaction) return;
+
+            currentEditId = id;
+            document.getElementById('editAmount').value = transaction.amount;
+            document.getElementById('editDescription').value = transaction.description;
+            document.getElementById('editCategory').value = transaction.category;
+            
+            const date = new Date(transaction.date);
+            const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            document.getElementById('editDate').value = localDateTime.toISOString().slice(0, 16);
+            
+            document.getElementById('editModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentEditId = null;
+        }
+
+        function saveEdit() {
+            if (!currentEditId) return;
+
+            const amount = parseFloat(document.getElementById('editAmount').value);
+            const description = document.getElementById('editDescription').value;
+            const category = document.getElementById('editCategory').value;
+            const date = document.getElementById('editDate').value;
+
+            if (!amount || amount <= 0) {
+                showAlert('אנא הכנס סכום תקין');
+                return;
             }
 
-            const blob = new Blob([content], { type: mimeType });
+            if (!description.trim()) {
+                showAlert('אנא הכנס תיאור');
+                return;
+            }
+
+            const transactionIndex = transactions.findIndex(t => t.id === currentEditId);
+            if (transactionIndex !== -1) {
+                transactions[transactionIndex] = {
+                    ...transactions[transactionIndex],
+                    amount: Math.abs(amount),
+                    description: description.trim(),
+                    category: category,
+                    date: new Date(date).toISOString()
+                };
+                saveTransactions();
+                updateDisplay();
+                closeEditModal();
+                showAlert('✅ שינויים נשמרו!');
+            }
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('למחוק תנועה זו?')) {
+                transactions = transactions.filter(t => t.id !== id);
+                saveTransactions();
+                updateDisplay();
+                showAlert('🗑️ תנועה נמחקה');
+            }
+        }
+
+        function showAlert(message) {
+            // Simple mobile-friendly alert replacement
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                left: 20px;
+                background: #333;
+                color: white;
+                padding: 15px;
+                border-radius: 8px;
+                z-index: 10000;
+                text-align: center;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.style.opacity = '0';
+                alertDiv.style.transition = 'opacity 0.3s';
+                setTimeout(() => document.body.removeChild(alertDiv), 300);
+            }, 2000);
+        }
+
+        function exportToCSV() {
+            if (transactions.length === 0) {
+                showAlert('אין תנועות לגיבוי');
+                return;
+            }
+
+            const headers = ['תאריך', 'סוג', 'סכום', 'תיאור', 'קטגוריה'];
+            const csvContent = [
+                headers.join(','),
+                ...transactions.map(t => [
+                    new Date(t.date).toLocaleDateString('he-IL'),
+                    t.type === 'income' ? 'הכנסה' : 'הוצאה',
+                    t.amount,
+                    `"${t.description}"`,
+                    t.category
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = filename;
+            link.download = `expenses_${new Date().toISOString().slice(0, 10)}.csv`;
             link.click();
-
-            showNotification(`הנתונים יוצאו בהצלחה כ-${format.toUpperCase()}`, 'success');
-        }
-
-        // Toggle dark mode
-        function toggleDarkMode() {
-            isDarkMode = !isDarkMode;
-            document.body.classList.toggle('dark-mode');
             
-            const themeIcon = document.getElementById('theme-icon');
-            themeIcon.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+            showAlert('📥 קובץ CSV נשמר!');
+        }
+
+        function showMonthlyReport() {
+            if (transactions.length === 0) {
+                showAlert('אין נתונים לדוח');
+                return;
+            }
+
+            const monthlyData = {};
+            transactions.forEach(t => {
+                const month = t.date.slice(0, 7);
+                if (!monthlyData[month]) {
+                    monthlyData[month] = { income: 0, expenses: 0 };
+                }
+                monthlyData[month][t.type === 'income' ? 'income' : 'expenses'] += t.amount;
+            });
+
+            let report = '📊 דוח חודשי:\n\n';
+            Object.keys(monthlyData).sort().reverse().slice(0, 6).forEach(month => {
+                const data = monthlyData[month];
+                const balance = data.income - data.expenses;
+                const monthName = new Date(month + '-01').toLocaleDateString('he-IL', { year: 'numeric', month: 'long' });
+                report += `${monthName}:\n`;
+                report += `💰 הכנסות: ₪${formatNumber(data.income)}\n`;
+                report += `💸 הוצאות: ₪${formatNumber(data.expenses)}\n`;
+                report += `📈 יתרה: ₪${formatNumber(balance)}\n\n`;
+            });
+
+            showLongAlert(report);
+        }
+
+        function showCategoryReport() {
+            if (transactions.length === 0) {
+                showAlert('אין נתונים לדוח');
+                return;
+            }
+
+            const categoryData = {};
+            transactions.forEach(t => {
+                if (!categoryData[t.category]) {
+                    categoryData[t.category] = { income: 0, expenses: 0, count: 0 };
+                }
+                categoryData[t.category][t.type === 'income' ? 'income' : 'expenses'] += t.amount;
+                categoryData[t.category].count++;
+            });
+
+            let report = '🏷️ דוח קטגוריות:\n\n';
+            Object.keys(categoryData).sort().forEach(category => {
+                const data = categoryData[category];
+                if (data.income > 0 || data.expenses > 0) {
+                    report += `${category} (${data.count} תנועות):\n`;
+                    if (data.income > 0) report += `💰 הכנסות: ₪${formatNumber(data.income)}\n`;
+                    if (data.expenses > 0) report += `💸 הוצאות: ₪${formatNumber(data.expenses)}\n`;
+                    report += '\n';
+                }
+            });
+
+            showLongAlert(report);
+        }
+
+        function showLongAlert(message) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0; right: 0; bottom: 0; left: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 15px;
+                max-width: 90%;
+                max-height: 80%;
+                overflow-y: auto;
+                white-space: pre-line;
+                font-family: monospace;
+                font-size: 14px;
+                line-height: 1.4;
+            `;
+
+            const closeBtn = document.createElement('div');
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: 30px;
+                height: 30px;
+                background: #f44336;
+                color: white;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                font-weight: bold;
+            `;
+            closeBtn.textContent = '×';
+            closeBtn.onclick = () => document.body.removeChild(modal);
+
+            content.style.position = 'relative';
+            content.textContent = message;
+            content.appendChild(closeBtn);
+            modal.appendChild(content);
             
-            localStorage.setItem('mymoneyTheme', isDarkMode ? 'dark' : 'light');
+            modal.onclick = (e) => {
+                if (e.target === modal) document.body.removeChild(modal);
+            };
+
+            document.body.appendChild(modal);
         }
 
-        // Calculator functions
-        function showCalculator() {
-            document.getElementById('calculator').classList.add('show');
+        function clearAllData() {
+            if (confirm('⚠️ למחוק את כל הנתונים?\nפעולה זו אינה ניתנת לביטול!')) {
+                transactions = [];
+                saveTransactions();
+                updateDisplay();
+                showAlert('🗑️ כל הנתונים נמחקו');
+            }
         }
 
-        function hideCalculator() {
-            document.getElementById('calculator').classList.remove('show');
+        function generateQuickAnalysis() {
+            if (transactions.length === 0) {
+                showAlert('אין נתונים לניתוח');
+                return;
+            }
+
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const balance = totalIncome - totalExpenses;
+            
+            const months = new Set(transactions.map(t => t.date.slice(0, 7)));
+            const avgMonthlyExpenses = totalExpenses / (months.size || 1);
+
+            const topCategories = {};
+            transactions.filter(t => t.type === 'expense').forEach(t => {
+                topCategories[t.category] = (topCategories[t.category] || 0) + t.amount;
+            });
+
+            const sortedCategories = Object.entries(topCategories).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            currentAnalysisData = `=== ניתוח מהיר של הוצאותיי ===
+
+נתונים כלליים:
+• סה"כ הכנסות: ₪${formatNumber(totalIncome)}
+• סה"כ הוצאות: ₪${formatNumber(totalExpenses)}
+• יתרה: ₪${formatNumber(balance)}
+• ממוצע הוצאות חודשי: ₪${formatNumber(avgMonthlyExpenses)}
+• תקופת הניתוח: ${months.size} חודשים
+• מספר תנועות: ${transactions.length}
+
+קטגוריות הוצאה מובילות:
+${sortedCategories.map((cat, i) => `${i + 1}. ${cat[0]}: ₪${formatNumber(cat[1])}`).join('\n')}
+
+רשימת התנועות (20 האחרונות):
+${transactions.slice(0, 20).map(t => {
+    const date = new Date(t.date).toLocaleDateString('he-IL');
+    return `${date} | ${t.type === 'income' ? '+' : '-'}₪${formatNumber(t.amount)} | ${t.description} | ${t.category}`;
+}).join('\n')}
+
+בקש מהAI לנתח את הנתונים ולתת המלצות לחיסכון ושיפור הרגלי הוצאה.`;
+
+            showAlert('✅ ניתוח מהיר הוכן!\nבחר צ\'אטבוט להעתקה ושליחה');
         }
 
-        function clearCalculator() {
-            calculatorDisplay = '0';
-            calculatorOperator = null;
-            calculatorPrevValue = null;
-            updateCalculatorDisplay();
+        function generateDeepAnalysis() {
+            if (transactions.length === 0) {
+                showAlert('אין נתונים לניתוח');
+                return;
+            }
+
+            const monthlyData = {};
+            const categoryTrends = {};
+            const dailyPatterns = {};
+            const weeklyPatterns = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [] };
+            
+            transactions.forEach(t => {
+                const date = new Date(t.date);
+                const month = t.date.slice(0, 7);
+                const day = date.getDay();
+                const hour = date.getHours();
+                
+                // Monthly analysis
+                if (!monthlyData[month]) monthlyData[month] = { income: 0, expenses: 0, count: 0 };
+                monthlyData[month][t.type === 'income' ? 'income' : 'expenses'] += t.amount;
+                monthlyData[month].count++;
+                
+                // Category trends
+                if (!categoryTrends[t.category]) categoryTrends[t.category] = { expenses: 0, income: 0, count: 0, avgAmount: 0 };
+                categoryTrends[t.category][t.type === 'income' ? 'income' : 'expenses'] += t.amount;
+                categoryTrends[t.category].count++;
+                
+                // Daily and weekly patterns
+                if (t.type === 'expense') {
+                    weeklyPatterns[day].push(t.amount);
+                    if (!dailyPatterns[hour]) dailyPatterns[hour] = [];
+                    dailyPatterns[hour].push(t.amount);
+                }
+            });
+
+            // Calculate averages
+            Object.keys(categoryTrends).forEach(cat => {
+                const data = categoryTrends[cat];
+                data.avgAmount = (data.expenses + data.income) / data.count;
+            });
+
+            const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const expenseRatio = totalIncome > 0 ? (totalExpenses / totalIncome * 100).toFixed(1) : 0;
+
+            const days = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+            
+            // Peak spending hours
+            const hourlySpending = Object.keys(dailyPatterns).map(hour => ({
+                hour: parseInt(hour),
+                total: dailyPatterns[hour].reduce((sum, amt) => sum + amt, 0),
+                count: dailyPatterns[hour].length
+            })).sort((a, b) => b.total - a.total).slice(0, 3);
+
+            currentAnalysisData = `=== ניתוח מעמיק של הרגלי הוצאה ===
+
+סיכום כללי:
+• יחס הוצאה להכנסה: ${expenseRatio}%
+• מספר תנועות כולל: ${transactions.length}
+• תקופת הניתוח: ${Object.keys(monthlyData).length} חודשים
+• ממוצע תנועות חודשי: ${(transactions.length / Object.keys(monthlyData).length).toFixed(1)}
+
+ניתוח חודשי מפורט (6 חודשים אחרונים):
+${Object.keys(monthlyData).sort().reverse().slice(0, 6).map(month => {
+    const data = monthlyData[month];
+    const balance = data.income - data.expenses;
+    const savingsRate = data.income > 0 ? ((balance / data.income) * 100).toFixed(1) : 0;
+    const monthName = new Date(month + '-01').toLocaleDateString('he-IL', { year: 'numeric', month: 'long' });
+    return `${monthName}: הכנסות ₪${formatNumber(data.income)} | הוצאות ₪${formatNumber(data.expenses)} | חיסכון ${savingsRate}% | ${data.count} תנועות`;
+}).join('\n')}
+
+דפוסי הוצאה שבועיים:
+${days.map((day, i) => {
+    const amounts = weeklyPatterns[i];
+    const avg = amounts.length > 0 ? amounts.reduce((sum, amt) => sum + amt, 0) / amounts.length : 0;
+    return `${day}: ממוצע ₪${formatNumber(avg)} (${amounts.length} תנועות)`;
+}).join('\n')}
+
+שעות הוצאה מובילות:
+${hourlySpending.map(h => `${h.hour}:00 - סה"כ ₪${formatNumber(h.total)} ב-${h.count} תנועות`).join('\n')}
+
+ניתוח קטגוריות מתקדם:
+${Object.keys(categoryTrends).sort((a, b) => categoryTrends[b].expenses - categoryTrends[a].expenses).map(category => {
+    const data = categoryTrends[category];
+    const percentage = totalExpenses > 0 ? ((data.expenses / totalExpenses) * 100).toFixed(1) : 0;
+    return `${category}: סה"כ ₪${formatNumber(data.expenses)} (${percentage}%) | ממוצע ₪${formatNumber(data.avgAmount)} | ${data.count} תנועות`;
+}).join('\n')}
+
+כל התנועות לניתוח מפורט:
+${transactions.map(t => {
+    const date = new Date(t.date).toLocaleDateString('he-IL');
+    const time = new Date(t.date).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    return `${date} ${time} | ${t.type === 'income' ? 'הכנסה' : 'הוצאה'} | ₪${formatNumber(t.amount)} | ${t.description} | ${t.category}`;
+}).join('\n')}
+
+בקש מהAI ניתוח מעמיק עם המלצות אישיות, זיהוי טרנדים, תחזיות, והמלצות לאופטימיזציה פיננסית.`;
+
+            showAlert('✅ ניתוח עומק הוכן!\nבחר צ\'אטבוט להעתקה ושליחה');
         }
 
-        function appendToCalculator(value) {
-            if (calculatorDisplay === '0' && !isNaN(value)) {
-                calculatorDisplay = value;
+        function openAI(platform) {
+            if (!currentAnalysisData) {
+                showAlert('אנא הכן תחילה ניתוח מהיר או עמוק');
+                return;
+            }
+
+            // Copy to clipboard
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentAnalysisData).then(() => {
+                    showAlert(`✅ הועתק ללוח!\nפותח ${platform}...`);
+                    setTimeout(() => openPlatform(platform), 1000);
+                }).catch(() => {
+                    fallbackCopyToClipboard();
+                });
             } else {
-                calculatorDisplay += value;
+                fallbackCopyToClipboard();
             }
-            updateCalculatorDisplay();
-        }
 
-        function deleteLast() {
-            calculatorDisplay = calculatorDisplay.length > 1 ? calculatorDisplay.slice(0, -1) : '0';
-            updateCalculatorDisplay();
-        }
+            function fallbackCopyToClipboard() {
+                const textArea = document.createElement('textarea');
+                textArea.value = currentAnalysisData;
+                textArea.style.position = 'fixed';
+                textArea.style.opacity = '0';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showAlert(`✅ הועתק ללוח!\nפותח ${platform}...`);
+                    setTimeout(() => openPlatform(platform), 1000);
+                } catch (err) {
+                    showAlert('❌ שגיאה בהעתקה - נסה שוב');
+                }
+                
+                document.body.removeChild(textArea);
+            }
 
-        function calculateResult() {
-            try {
-                const result = eval(calculatorDisplay.replace('×', '*').replace('÷', '/'));
-                calculatorDisplay = result.toString();
-                updateCalculatorDisplay();
-            } catch (error) {
-                calculatorDisplay = 'Error';
-                updateCalculatorDisplay();
+            function openPlatform(platform) {
+                let url = '';
+                switch(platform) {
+                    case 'claude':
+                        url = 'https://claude.ai';
+                        break;
+                    case 'chatgpt':
+                        url = 'https://chat.openai.com';
+                        break;
+                    case 'gemini':
+                        url = 'https://gemini.google.com';
+                        break;
+                    case 'cohere':
+                        url = 'https://coral.cohere.com';
+                        break;
+                    case 'perplexity':
+                        url = 'https://www.perplexity.ai';
+                        break;
+                }
+                window.open(url, '_blank');
             }
         }
 
-        function updateCalculatorDisplay() {
-            document.getElementById('calc-display').textContent = calculatorDisplay;
+        // Keyboard shortcuts for mobile
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'e':
+                        e.preventDefault();
+                        document.getElementById('amount').focus();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        exportToCSV();
+                        break;
+                }
+            }
+        });
+
+        // Prevent zoom on input focus for iOS
+        document.querySelectorAll('input, select, textarea').forEach(element => {
+            element.addEventListener('focus', function() {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            });
+            
+            element.addEventListener('blur', function() {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=no');
+                }
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
         }
 
-        // Show notification
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
+        // Initialize filters after DOM load with safety checks
+        function safeUpdateFilters() {
+            const categoryFilter = document.getElementById('filterCategory');
+            if (!categoryFilter) {
+                setTimeout(safeUpdateFilters, 100);
+                return;
+            }
+            
+            updateFilters();
+            
+            // Set current month as default filter
+            const monthFilter = document.getElementById('filterMonth');
+            if (monthFilter) {
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                monthFilter.value = currentMonth;
+            }
+        }
 
+        // Call after initialization
+        setTimeout(safeUpdateFilters, 1000);
+
+        // Add swipe gestures for mobile (optional enhancement)
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', e => {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const diffX = touchStartX - touchEndX;
+            const diffY = touchStartY - touchEndY;
+
+            // Swipe left to right - focus amount input for quick entry
+            if (Math.abs(diffX) > Math.abs(diffY) && diffX < -100) {
+                document.getElementById('amount').focus();
+            }
+        });
+
+        // PWA-like experience - prevent refresh
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Auto-save draft while typing (prevents data loss)
+        function initializeDraftSaving() {
+            const amountField = document.getElementById('amount');
+            const descField = document.getElementById('description');
+            const categoryField = document.getElementById('category');
+
+            if (amountField) {
+                amountField.addEventListener('input', saveDraft);
+            }
+            if (descField) {
+                descField.addEventListener('input', saveDraft);
+            }
+            if (categoryField) {
+                categoryField.addEventListener('change', saveDraft);
+            }
+
+            function saveDraft() {
+                const draft = {
+                    amount: amountField ? amountField.value : '',
+                    description: descField ? descField.value : '',
+                    category: categoryField ? categoryField.value : 'שונות'
+                };
+                localStorage.setItem('draft', JSON.stringify(draft));
+            }
+        }
+
+        function clearDraft() {
+            localStorage.removeItem('draft');
+        }
+
+        // Initialize draft saving when DOM is ready
+        setTimeout(() => {
+            initializeDraftSaving();
+        }, 1000);
+
+        // Clear draft after successful transaction
+        function clearDraft() {
+            localStorage.removeItem('draft');
+        }
+
+        // Enhanced addTransaction with draft clearing
+        function addTransactionWithDraft(type) {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const description = document.getElementById('description').value;
+            const category = document.getElementById('category').value;
+
+            if (!amount || amount <= 0) {
+                showAlert('אנא הכנס סכום תקין');
+                document.getElementById('amount').focus();
+                return;
+            }
+
+            if (!description.trim()) {
+                showAlert('אנא הכנס תיאור');
+                document.getElementById('description').focus();
+                return;
+            }
+
+            const now = new Date();
+            const transaction = {
+                id: Date.now(),
+                type: type,
+                amount: Math.abs(amount),
+                description: description.trim(),
+                category: category,
+                date: now.toISOString()
+            };
+
+            transactions.unshift(transaction);
+            saveTransactions();
+            updateDisplay();
+            clearForm();
+            clearDraft();
+            
+            // Success feedback
+            showAlert(type === 'income' ? '✅ הכנסה נקלטה!' : '✅ הוצאה נקלטה!');
+            
+            // Auto-focus for next entry
             setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Helper functions
-        function getCategoryName(categoryKey, type) {
-            const categories = type === 'expense' ? expenseCategories : incomeCategories;
-            return categories[categoryKey] ? categories[categoryKey].name : categoryKey;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('he-IL');
+                const amountField = document.getElementById('amount');
+                if (amountField) amountField.focus();
+            }, 100);
         }
     </script>
 </body>
