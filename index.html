@@ -1,638 +1,800 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#6366f1">
-  <title>קופה קלה – ניהול כספים יומי</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root { --brand:#6366f1; --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; }
-    html,body{ height:100%; }
-    body{ font-family: 'Heebo', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial,"Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; }
-    .glass{ background: rgba(255,255,255,0.65); backdrop-filter: blur(8px); }
-    .dark .glass{ background: rgba(17,24,39,0.55); }
-    .tab-active{ color:#111827; border-color: var(--brand); }
-    .dark .tab-active{ color:#f9fafb; }
-    .ring-brand{ box-shadow:0 0 0 3px rgba(99,102,241,0.35) }
-    .btn{ @apply px-4 py-3 rounded-2xl font-medium shadow-sm transition active:scale-[.98]; }
-    .btn-primary{ background:var(--brand); color:white; }
-    .btn-ghost{ @apply bg-transparent; }
-    .pill{ @apply text-sm px-2 py-1 rounded-full; }
-    .toast{ position: fixed; inset-inline:0; bottom: 82px; display:flex; justify-content:center; pointer-events:none; }
-    .toast > div{ pointer-events:auto; }
-    .progress{ height:10px; border-radius:999px; background:rgba(0,0,0,.08); overflow:hidden }
-    .dark .progress{ background:rgba(255,255,255,.12) }
-    .progress > span{ display:block; height:100%; background:linear-gradient(90deg, var(--brand), #22d3ee); }
-    .card{ @apply rounded-3xl p-4 shadow-md glass; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="light-content">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#8b5cf6">
+  <meta name="description" content="אפליקציית ניהול כספים אישיים פשוטה ויעילה">
+  <title>קופה קלה - ניהול כספים</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- External Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary: #8b5cf6;
+      --primary-light: #a78bfa;
+      --primary-dark: #7c3aed;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --gray: #64748b;
+      --gray-light: #f1f5f9;
+      --gray-dark: #334155;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      box-sizing: border-box;
+    }
+
+    input, textarea, select {
+      -webkit-user-select: auto;
+      user-select: auto;
+    }
+
+    html, body {
+      height: 100vh;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark .container {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    /* Header Styles */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      padding: max(env(safe-area-inset-top), 12px) 20px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+    }
+
+    .balance-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 16px;
+      margin-top: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Card Styles */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .card {
+      background: #1e293b;
+      border-color: #334155;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Button Styles */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      min-height: 44px; /* Touch target size */
+      touch-action: manipulation;
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-ghost {
+      background: var(--gray-light);
+      color: var(--gray-dark);
+    }
+
+    .dark .btn-ghost {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      color: var(--gray);
+    }
+
+    .dark .btn-outline {
+      border-color: #475569;
+      color: #94a3b8;
+    }
+
+    /* Input Styles */
+    .form-input {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      font-size: 16px; /* Prevents zoom on iOS */
+      background: #fafafa;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .dark .form-input {
+      background: #334155;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    .dark .form-input:focus {
+      background: #1e293b;
+      border-color: var(--primary-light);
+    }
+
+    .amount-input {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    /* Kind Selection */
+    .kind-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .kind-btn {
+      padding: 16px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      background: #f8fafc;
+    }
+
+    .kind-btn.expense {
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+
+    .kind-btn.expense.active {
+      background: var(--danger);
+      color: white;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .kind-btn.income {
+      color: var(--success);
+      border-color: #bbf7d0;
+    }
+
+    .kind-btn.income.active {
+      background: var(--success);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Navigation */
+    .bottom-nav {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      padding: 8px 0 max(env(safe-area-inset-bottom), 8px);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .dark .bottom-nav {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px;
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 12px;
+      border-top: 3px solid transparent;
+      transition: all 0.2s ease;
+      min-height: 44px;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+      border-color: var(--primary);
+      background: rgba(139, 92, 246, 0.05);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      transition: width 0.3s ease;
+    }
+
+    /* History Item */
+    .history-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .dark .history-item {
+      border-color: #334155;
+    }
+
+    .history-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: 12px;
+      font-size: 18px;
+    }
+
+    .history-icon.expense {
+      background: #fef2f2;
+      color: var(--danger);
+    }
+
+    .history-icon.income {
+      background: #f0fdf4;
+      color: var(--success);
+    }
+
+    .dark .history-icon.expense {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .dark .history-icon.income {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    /* Templates */
+    .template-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 8px;
+    }
+
+    .template-btn {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: right;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+
+    .dark .template-btn {
+      background: #334155;
+      border-color: #475569;
+      color: #e2e8f0;
+    }
+
+    .template-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .dark .modal-content {
+      background: #1e293b;
+    }
+
+    .modal-overlay.show .modal-content {
+      transform: translateY(0);
+    }
+
+    @media (min-width: 480px) {
+      .modal-content {
+        border-radius: 20px;
+        margin-bottom: 20px;
+      }
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      z-index: 1001;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Dark mode toggle */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Chart container */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin: 16px 0;
+    }
+
+    /* Loading state */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    /* Responsive text */
+    @media (max-width: 360px) {
+      .form-input {
+        padding: 14px;
+      }
+      
+      .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-  <div id="app" class="min-h-screen flex flex-col">
-        <header class="sticky top-0 z-20 bg-gradient-to-b from-indigo-500/90 to-indigo-400/60 dark:from-indigo-700/70 dark:to-indigo-600/40 text-white">
-      <div class="max-w-screen-sm mx-auto px-4 py-3 flex items-center gap-3">
-        <button id="themeBtn" class="pill bg-white/20 hover:bg-white/30">🌓 מצב</button>
-        <h1 class="text-xl font-bold flex-1 text-center">קופה קלה</h1>
-        <button id="settingsBtn" class="pill bg-white/20 hover:bg-white/30">⚙️</button>
-      </div>
-      <div class="max-w-screen-sm mx-auto px-4 pb-3 -mt-2">
-        <p id="monthLabel" class="text-sm/6 opacity-90"></p>
-      </div>
-    </header>
 
-        <main class="flex-1 max-w-screen-sm mx-auto w-full px-3 py-3 space-y-3">
-            <section id="view-add" class="space-y-3">
-        <div class="card">
-          <div class="flex items-center gap-2">
-            <button data-kind="expense" class="kindBtn btn flex-1 bg-rose-500/90 text-white">הוצאה</button>
-            <button data-kind="income" class="kindBtn btn flex-1 bg-emerald-500/90 text-white">הכנסה</button>
-          </div>
-          <form id="quickForm" class="mt-3 grid grid-cols-2 gap-3" autocomplete="off">
-            <div class="col-span-2">
-              <label class="block text-sm mb-1">סכום (₪)</label>
-              <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="לדוגמה: 35" required />
-            </div>
-            <div class="col-span-1">
-              <label class="block text-sm mb-1">קטגוריה</label>
-              <select id="category" class="w-full rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand"></select>
-              <button id="addCategoryBtn" type="button" class="mt-1 text-xs text-indigo-600">➕ הוספת קטגוריה</button>
-            </div>
-            <div class="col-span-1">
-              <label class="block text-sm mb-1">תאריך</label>
-              <input id="date" type="date" class="w-full rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" />
-            </div>
-            <div class="col-span-2">
-              <label class="block text-sm mb-1">תיאור (לא חובה)</label>
-              <input id="note" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="לדוגמה: קפה, נסיעה, מלגה..." />
-            </div>
-            <div class="col-span-2 flex items-center gap-2">
-              <input id="saveTemplate" type="checkbox" class="scale-125">
-              <label for="saveTemplate" class="text-sm">שמור כתבנית לחזרה מהירה</label>
-            </div>
-            <div class="col-span-2">
-              <button class="btn btn-primary w-full" type="submit">💾 שמירה מהירה</button>
-            </div>
-          </form>
-        </div>
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+  <div id="app" class="container">
+    <!-- Header -->
+    <header class="header">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <button id="themeBtn" class="btn-outline" style="padding: 8px 12px; font-size: 12px;">🌓</button>
+        <div>
+          <h1 style="font-size: 20px; font-weight: 600; margin: 0;">קופה קלה</h1>
+          <p id="monthLabel" style="font-size: 13px; opacity: 0.9; margin: 4px 0 0;"></p>
+        </div>
+        <button id="settingsBtn" class="btn-outline" style="padding: 8px 12px; font-size: 12px;">⚙️</button>
+      </div>
+      
+      <div class="balance-card">
+        <div style="font-size: 13px; opacity: 0.8; margin-bottom: 4px;">יתרה חודשית</div>
+        <div id="mainBalance" style="font-size: 28px; font-weight: 700; margin-bottom: 12px;">₪0</div>
+        <div style="display: flex; justify-content: space-around;">
+          <div style="text-align: center;">
+            <div style="font-size: 12px; opacity: 0.8;">הכנסות</div>
+            <div id="headerIncome" style="font-weight: 600; color: #34d399;">₪0</div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 12px; opacity: 0.8;">הוצאות</div>
+            <div id="headerExpense" style="font-weight: 600; color: #f87171;">₪0</div>
+          </div>
+        </div>
+      </div>
+    </header>
 
-                <div class="card" id="templatesCard" hidden>
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-semibold">שימוש מהיר בפעולות חוזרות</h3>
-            <button id="clearTemplates" class="text-xs text-rose-400">נקה תבניות</button>
-          </div>
-          <div id="templatesList" class="flex flex-wrap gap-2"></div>
-        </div>
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Add Transaction View -->
+      <section id="view-add">
+        <!-- Amount Input -->
+        <div class="card">
+          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);">סכום</label>
+          <div style="position: relative;">
+            <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" 
+              class="form-input amount-input" placeholder="0" required />
+            <div style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; font-weight: 600; color: var(--gray);">₪</div>
+          </div>
+        </div>
 
-                <div class="grid grid-cols-3 gap-3">
-          <div class="card text-center">
-            <div class="text-sm opacity-80">הכנסות בחודש</div>
-            <div id="sumIncome" class="text-xl font-bold">₪0</div>
-          </div>
-          <div class="card text-center">
-            <div class="text-sm opacity-80">הוצאות בחודש</div>
-            <div id="sumExpense" class="text-xl font-bold">₪0</div>
-          </div>
-          <div class="card text-center">
-            <div class="text-sm opacity-80">יתרה נוכחית</div>
-            <div id="balance" class="text-xl font-bold">₪0</div>
-          </div>
-        </div>
+        <!-- Transaction Type -->
+        <div class="card">
+          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);">סוג פעולה</label>
+          <div class="kind-selector">
+            <div class="kind-btn expense" data-kind="expense">
+              <div style="font-size: 24px; margin-bottom: 4px;">💸</div>
+              <div style="font-weight: 500;">הוצאה</div>
+            </div>
+            <div class="kind-btn income" data-kind="income">
+              <div style="font-size: 24px; margin-bottom: 4px;">💰</div>
+              <div style="font-weight: 500;">הכנסה</div>
+            </div>
+          </div>
+        </div>
 
-                <div class="card">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-semibold">תקציב חודשי – מבט מהיר</h3>
-            <button class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200" data-nav="budget">ניהול תקציב</button>
-          </div>
-          <div id="budgetGlance" class="space-y-3"></div>
-        </div>
-      </section>
+        <!-- Transaction Details -->
+        <div class="card">
+          <form id="quickForm">
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">קטגוריה</label>
+              <select id="category" class="form-input" required>
+                <option value="">בחר קטגוריה</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">תאריך</label>
+              <input id="date" type="date" class="form-input" />
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">תיאור (אופציונלי)</label>
+              <input id="note" class="form-input" placeholder="למשל: קפה עם חברים, תדלוק..." />
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 16px; font-weight: 600;">
+              💾 שמור פעולה
+            </button>
+          </form>
+        </div>
 
-            <section id="view-reports" class="space-y-3 hidden">
-        <div class="card">
-          <h3 class="font-semibold mb-2">פילוח הוצאות לפי קטגוריות (החודש)</h3>
-          <canvas id="pieCats" height="200"></canvas>
-        </div>
-        <div class="card">
-          <h3 class="font-semibold mb-2">מגמה יומית נטו (החודש)</h3>
-          <canvas id="lineDaily" height="200"></canvas>
-        </div>
-      </section>
+        <!-- Quick Templates -->
+        <div class="card" id="templatesCard" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-weight: 600; margin: 0;">תבניות מהירות</h3>
+            <button id="clearTemplates" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">🗑️ נקה</button>
+          </div>
+          <div id="templatesList" class="template-grid"></div>
+        </div>
 
-            <section id="view-budget" class="space-y-3 hidden">
-        <div class="card">
-          <div class="flex items-center justify-between mb-2">
-            <h3 class="font-semibold">הגדרת תקציבים לפי קטגוריה</h3>
-            <button id="addBudgetRow" class="pill bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200">➕ קטגוריה</button>
-          </div>
-          <div class="space-y-2" id="budgetList"></div>
-          <div class="mt-2 flex gap-2">
-            <button id="saveBudgets" class="btn btn-primary flex-1">שמירת תקציב</button>
-            <button id="resetBudgets" class="btn flex-1 bg-slate-200 dark:bg-slate-700">איפוס</button>
-          </div>
-        </div>
-      </section>
+        <!-- Budget Overview -->
+        <div class="card" id="budgetOverview">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="font-weight: 600; margin: 0;">מצב תקציב</h3>
+            <button class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" data-nav="budget">📊 ניהול</button>
+          </div>
+          <div id="budgetGlance"></div>
+        </div>
+      </section>
 
-            <section id="view-history" class="space-y-3 hidden">
-        <div class="card">
-          <div class="flex gap-2 items-center">
-            <input id="search" class="w-full rounded-2xl px-4 py-3 bg-white/80 dark:bg-slate-800/70 outline-none focus:ring-2 ring-brand" placeholder="חיפוש לפי תיאור/קטגוריה" />
-            <select id="filterKind" class="rounded-2xl px-3 py-3 bg-white/80 dark:bg-slate-800/70">
-              <option value="all">הכל</option>
-              <option value="expense">הוצאות</option>
-              <option value="income">הכנסות</option>
-            </select>
-          </div>
-        </div>
-        <div class="card">
-          <div class="flex gap-2 mb-2">
-            <button id="exportCSV" class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200">📤 ייצוא CSV</button>
-            <button id="exportJSON" class="pill bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200">📤 ייצוא JSON</button>
-            <label class="pill bg-slate-200 dark:bg-slate-700 cursor-pointer">📥 ייבוא JSON
-              <input id="importJSON" type="file" accept="application/json" class="hidden" />
-            </label>
-            <button id="loadDemo" class="pill bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">נתוני הדגמה</button>
-            <button id="clearAll" class="pill bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200">ניקוי הכל</button>
-          </div>
-          <ul id="historyList" class="divide-y divide-slate-200 dark:divide-slate-800"></ul>
-        </div>
-      </section>
-    </main>
+      <!-- Reports View -->
+      <section id="view-reports" class="hidden">
+        <div class="card">
+          <h3 style="font-weight: 600; margin-bottom: 16px;">פילוח הוצאות החודש</h3>
+          <div class="chart-container">
+            <canvas id="expenseChart"></canvas>
+          </div>
+        </div>
+        
+        <div class="card">
+          <h3 style="font-weight: 600; margin-bottom: 16px;">מגמה יומית</h3>
+          <div class="chart-container">
+            <canvas id="dailyChart"></canvas>
+          </div>
+        </div>
+      </section>
 
-        <nav class="sticky bottom-0 z-30 bg-white/90 dark:bg-slate-800/80 backdrop-blur border-t border-slate-200/70 dark:border-slate-700/60">
-      <div class="max-w-screen-sm mx-auto grid grid-cols-4">
-        <button data-nav="add" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1 tab-active">➕<span>הוספה</span></button>
-        <button data-nav="reports" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">📈<span>דוחות</span></button>
-        <button data-nav="budget" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">💳<span>תקציב</span></button>
-        <button data-nav="history" class="tab px-3 py-3 text-sm border-t-2 border-transparent flex flex-col items-center gap-1">🗂️<span>היסטוריה</span></button>
-      </div>
-    </nav>
-  </div>
+      <!-- Budget View -->
+      <section id="view-budget" class="hidden">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-weight: 600; margin: 0;">תקציבים חודשיים</h3>
+            <button id="addBudgetBtn" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">➕ הוסף</button>
+          </div>
+          <div id="budgetList"></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+            <button id="saveBudgets" class="btn btn-primary">💾 שמור</button>
+            <button id="resetBudgets" class="btn btn-ghost">🔄 איפוס</button>
+          </div>
+        </div>
+      </section>
 
-    <div class="toast" id="toast" hidden>
-    <div class="px-4 py-2 rounded-full bg-slate-900 text-white dark:bg-black/80">נשמר בהצלחה ✅</div>
-  </div>
+      <!-- History View -->
+      <section id="view-history" class="hidden">
+        <div class="card">
+          <input id="searchInput" class="form-input" placeholder="🔍 חיפוש..." style="margin-bottom: 12px;" />
+          <select id="filterSelect" class="form-input">
+            <option value="all">כל הפעולות</option>
+            <option value="expense">הוצאות</option>
+            <option value="income">הכנסות</option>
+          </select>
+        </div>
+        
+        <div class="card">
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
+            <button id="exportBtn" class="btn btn-outline" style="font-size: 12px;">📤 ייצוא</button>
+            <button id="importBtn" class="btn btn-outline" style="font-size: 12px;">📥 ייבוא</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;" />
+          </div>
+          <button id="clearAllBtn" class="btn btn-danger" style="width: 100%; font-size: 12px;">🗑️ מחק הכל</button>
+        </div>
+        
+        <div class="card">
+          <h3 style="font-weight: 600; margin-bottom: 16px;">היסטוריית פעולות</h3>
+          <div id="historyList"></div>
+        </div>
+      </section>
+    </main>
 
-    <div id="settingsModal" class="fixed inset-0 bg-black/40 hidden items-end sm:items-center sm:justify-center">
-    <div class="bg-white dark:bg-slate-800 w-full sm:max-w-md p-4 rounded-t-3xl sm:rounded-3xl space-y-3">
-      <div class="flex items-center justify-between">
-        <h3 class="font-semibold">הגדרות</h3>
-        <button id="closeSettings" class="pill bg-slate-100 dark:bg-slate-700">✖</button>
-      </div>
-      <div class="flex items-center justify-between">
-        <div class="space-y-1">
-          <div class="font-medium">מצב כהה</div>
-          <div class="text-sm opacity-80">נוח לעיניים בשעות ערב</div>
-        </div>
-        <label class="inline-flex items-center cursor-pointer">
-          <input type="checkbox" id="darkToggle" class="sr-only peer">
-          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-indigo-600 relative after:content-[''] after:absolute after:top-[2px] after:right-[2px] after:bg-white after:h-5 after:w-5 after:rounded-full after:transition-all peer-checked:after:-translate-x-full"></div>
-        </label>
-      </div>
-      <div class="space-y-2">
-        <div class="text-sm opacity-80">גרסה ראשונית • אחסון מקומי בדפדפן • ייצוא CSV/JSON בעברית</div>
-      </div>
-    </div>
-  </div>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active" data-nav="add">
+        <div class="nav-icon">➕</div>
+        <div>הוספה</div>
+      </a>
+      <a href="#" class="nav-item" data-nav="reports">
+        <div class="nav-icon">📊</div>
+        <div>דוחות</div>
+      </a>
+      <a href="#" class="nav-item" data-nav="budget">
+        <div class="nav-icon">💳</div>
+        <div>תקציב</div>
+      </a>
+      <a href="#" class="nav-item" data-nav="history">
+        <div class="nav-icon">📋</div>
+        <div>היסטוריה</div>
+      </a>
+    </nav>
+  </div>
 
-  <script>
-  // ===== State & Storage =====
-  const LS_KEYS = {
-    entries: 'kk_entries',
-    budgets: 'kk_budgets',
-    categories: 'kk_categories',
-    templates: 'kk_templates',
-    theme: 'kk_theme'
-  };
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-weight: 600; margin: 0;">הגדרות</h3>
+        <button id="closeSettings" class="btn btn-ghost" style="padding: 6px;">✖️</button>
+      </div>
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <div style="font-weight: 500;">מצב לילה</div>
+          <div style="font-size: 13px; color: var(--gray); margin-top: 2px;">חוויה נעימה בחושך</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
+        <div style="font-size: 13px; color: var(--gray);">
+          <div style="margin-bottom: 8px;">✓ שמירה מקומית בטוחה</div>
+          <div style="margin-bottom: 8px;">✓ ייצוא וגיבוי נתונים</div>
+          <div>✓ ממשק מותאם לנייד</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  const DEFAULTS = {
-    categoriesExpense: ['מזון','בגדים','יציאות','תחבורה','קוסמטיקה','ספרים/לימודים','בילויים','שכר דירה','סלולר/אינטרנט','בריאות'],
-    categoriesIncome: ['עבודה','משפחה','מלגות','עבודות צד'],
-  };
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
 
-  let state = {
-    kind: 'expense', // 'expense' | 'income'
-    entries: load(LS_KEYS.entries, []),
-    budgets: load(LS_KEYS.budgets, {}),
-    categories: load(LS_KEYS.categories, { expense: DEFAULTS.categoriesExpense, income: DEFAULTS.categoriesIncome }),
-    templates: load(LS_KEYS.templates, []),
-    theme: load(LS_KEYS.theme, (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')),
-    charts: { pie: null, line: null }
-  };
+  <script>
+    // App State
+    const APP_STATE = {
+      currentView: 'add',
+      currentKind: 'expense',
+      entries: JSON.parse(localStorage.getItem('entries') || '[]'),
+      budgets: JSON.parse(localStorage.getItem('budgets') || '{}'),
+      categories: JSON.parse(localStorage.getItem('categories') || '{"expense":["מזון","תחבורה","בילויים","קניות","בגדים","בריאות","בית","אחר"],"income":["משכורת","פרילנס","מתנות","השקעות","אחר"]}'),
+      templates: JSON.parse(localStorage.getItem('templates') || '[]'),
+      charts: { expense: null, daily: null }
+    };
 
-  if (state.theme === 'dark') document.documentElement.classList.add('dark');
+    // Theme Management
+    const THEME = {
+      current: localStorage.getItem('theme') || 'light',
+      
+      init() {
+        this.apply();
+        document.getElementById('darkModeToggle').checked = this.current === 'dark';
+      },
+      
+      toggle() {
+        this.current = this.current === 'light' ? 'dark' : 'light';
+        this.apply();
+        this.save();
+      },
+      
+      apply() {
+        document.documentElement.classList.toggle('dark', this.current === 'dark');
+      },
+      
+      save() {
+        localStorage.setItem('theme', this.current);
+      }
+    };
 
-  // Demo data on very first run
-  if (!localStorage.getItem('kk_has_booted')) {
-    if (state.entries.length === 0) {
-      seedDemo();
-    }
-    localStorage.setItem('kk_has_booted','1');
-  }
-
-  // ===== Utilities =====
-  function load(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback }catch(e){ return fallback } }
-  function save(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
-  const fmtCurrency = (n)=> new Intl.NumberFormat('he-IL',{ style:'currency', currency:'ILS', maximumFractionDigits:2 }).format(n || 0);
-  const todayStr = ()=> new Date().toISOString().slice(0,10);
-  const sameMonth = (d, y = new Date().getFullYear(), m = new Date().getMonth()) => { const dt = new Date(d); return dt.getFullYear()===y && dt.getMonth()===m };
-  const monthName = (d=new Date())=> new Intl.DateTimeFormat('he-IL',{ month:'long', year:'numeric'}).format(d);
-
-  function toast(msg='נשמר בהצלחה ✅'){
-    const el = document.getElementById('toast');
-    el.querySelector('div').textContent = msg;
-    el.hidden = false; setTimeout(()=> el.hidden = true, 1400);
-  }
-
-  function uid(){ return Math.random().toString(36).slice(2) + Date.now().toString(36) }
-
-  // ===== UI Wiring =====
-  const monthLabel = document.getElementById('monthLabel');
-  const amount = document.getElementById('amount');
-  const category = document.getElementById('category');
-  const dateEl = document.getElementById('date');
-  const note = document.getElementById('note');
-  const saveTemplate = document.getElementById('saveTemplate');
-  const quickForm = document.getElementById('quickForm');
-  const sumIncome = document.getElementById('sumIncome');
-  const sumExpense = document.getElementById('sumExpense');
-  const balance = document.getElementById('balance');
-  const budgetGlance = document.getElementById('budgetGlance');
-  const templatesCard = document.getElementById('templatesCard');
-  const templatesList = document.getElementById('templatesList');
-  const clearTemplates = document.getElementById('clearTemplates');
-
-  const search = document.getElementById('search');
-  const filterKind = document.getElementById('filterKind');
-  const historyList = document.getElementById('historyList');
-
-  const exportCSV = document.getElementById('exportCSV');
-  const exportJSON = document.getElementById('exportJSON');
-  const importJSON = document.getElementById('importJSON');
-  const loadDemoBtn = document.getElementById('loadDemo');
-  const clearAllBtn = document.getElementById('clearAll');
-
-  const budgetList = document.getElementById('budgetList');
-  const saveBudgets = document.getElementById('saveBudgets');
-  const resetBudgets = document.getElementById('resetBudgets');
-  const addBudgetRow = document.getElementById('addBudgetRow');
-
-  const themeBtn = document.getElementById('themeBtn');
-  const settingsBtn = document.getElementById('settingsBtn');
-  const settingsModal = document.getElementById('settingsModal');
-  const closeSettings = document.getElementById('closeSettings');
-  const darkToggle = document.getElementById('darkToggle');
-
-  // Tabs
-  document.querySelectorAll('.tab').forEach(b=> b.addEventListener('click', ()=> switchView(b.dataset.nav)));
-  document.querySelectorAll('[data-nav]')
-    .forEach(b=>{ if(b.classList.contains('pill')) b.addEventListener('click',()=> switchView(b.dataset.nav)); });
-
-  // Kind toggle
-  document.querySelectorAll('.kindBtn').forEach(btn=> btn.addEventListener('click', ()=> setKind(btn.dataset.kind)));
-
-  // Category add
-  document.getElementById('addCategoryBtn').addEventListener('click', ()=>{
-    const k = state.kind;
-    const name = prompt('שם קטגוריה חדשה ('+(k==='expense'?'הוצאה':'הכנסה')+')');
-    if(!name) return;
-    if(!state.categories[k].includes(name)){
-      state.categories[k].push(name);
-      save(LS_KEYS.categories, state.categories);
-      buildCategories();
-      category.value = name;
-    }
-  });
-
-  // Quick Form
-  quickForm.addEventListener('submit', (e)=>{
-    e.preventDefault();
-    const amt = parseFloat(amount.value);
-    if(!amt || amt<=0) { amount.focus(); return; }
-    const entry = {
-      id: uid(),
-      date: dateEl.value || todayStr(),
-      kind: state.kind,
-      category: category.value,
-      amount: +amt.toFixed(2),
-      note: (note.value||'').trim()
-    };
-    state.entries.unshift(entry);
-    save(LS_KEYS.entries, state.entries);
-
-    if (saveTemplate.checked){
-      state.templates.unshift({ kind:entry.kind, category:entry.category, note:entry.note||'', amount: entry.amount });
-      state.templates = dedupTemplates(state.templates).slice(0,10);
-      save(LS_KEYS.templates, state.templates);
-      renderTemplates();
-    }
-
-    quickForm.reset();
-    dateEl.value = todayStr();
-    toast();
-    refreshAll();
-  });
-
-  clearTemplates.addEventListener('click', ()=>{
-    if(confirm('למחוק את כל התבניות השמורות?')){
-      state.templates = []; save(LS_KEYS.templates, state.templates); renderTemplates();
-    }
-  });
-
-  // History actions
-  search.addEventListener('input', renderHistory);
-  filterKind.addEventListener('change', renderHistory);
-
-  // Export / Import
-  exportCSV.addEventListener('click', ()=> downloadCSV());
-  exportJSON.addEventListener('click', ()=> downloadJSON());
-  importJSON.addEventListener('change', handleImportJSON);
-  loadDemoBtn.addEventListener('click', ()=> { if(confirm('לטעון נתוני הדגמה? פעולה זו תוסיף נתונים.')) { seedDemo(true); refreshAll(); }});
-  clearAllBtn.addEventListener('click', ()=>{
-    if(confirm('למחוק את כל הנתונים? (אפשר לגבות קודם ב-JSON/CSV)')){
-      state.entries=[]; save(LS_KEYS.entries, state.entries);
-      state.budgets={}; save(LS_KEYS.budgets, state.budgets);
-      toast('נוקה בהצלחה 🧹'); refreshAll();
-    }
-  });
-
-  // Budgets
-  saveBudgets.addEventListener('click', ()=>{
-    const rows = budgetList.querySelectorAll('[data-row]');
-    const next = {};
-    rows.forEach(r=>{
-      const cat = r.querySelector('input[name="cat"]').value.trim();
-      const val = parseFloat(r.querySelector('input[name="amt"]').value);
-      if(cat && val>0) next[cat] = +val.toFixed(2);
-    });
-    state.budgets = next; save(LS_KEYS.budgets, state.budgets);
-    toast('התקציב נשמר 📌'); refreshAll();
-  });
-
-  resetBudgets.addEventListener('click', ()=>{ if(confirm('לאפס תקציבים?')){ state.budgets={}; save(LS_KEYS.budgets, state.budgets); refreshAll(); }});
-  addBudgetRow.addEventListener('click', ()=> budgetList.appendChild(budgetRow('', '')));
-
-  // Theme & Settings
-  themeBtn.addEventListener('click', toggleTheme);
-  settingsBtn.addEventListener('click', ()=> settingsModal.classList.remove('hidden'));
-  closeSettings.addEventListener('click', ()=> settingsModal.classList.add('hidden'));
-  settingsModal.addEventListener('click', (e)=>{ if(e.target===settingsModal) settingsModal.classList.add('hidden') });
-  darkToggle.checked = state.theme==='dark';
-  darkToggle.addEventListener('change', toggleTheme);
-
-  function toggleTheme(){
-    document.documentElement.classList.toggle('dark');
-    state.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-    save(LS_KEYS.theme, state.theme);
-  }
-
-  // ===== Renderers =====
-  function buildCategories(){
-    const list = (state.kind==='expense' ? state.categories.expense : state.categories.income);
-    category.innerHTML = list.map(c=>`<option>${c}</option>`).join('');
-  }
-
-  function setKind(k){ state.kind = k; document.querySelectorAll('.kindBtn').forEach(b=> b.classList.remove('ring-brand'));
-    document.querySelector(`.kindBtn[data-kind="${k}"]`).classList.add('ring-brand');
-    buildCategories();
-  }
-
-  function renderSnapshot(){
-    const now = new Date();
-    const monthEntries = state.entries.filter(e=> sameMonth(e.date, now.getFullYear(), now.getMonth()));
-    const totalIncome = monthEntries.filter(e=>e.kind==='income').reduce((s,e)=> s+e.amount,0);
-    const totalExpense = monthEntries.filter(e=>e.kind==='expense').reduce((s,e)=> s+e.amount,0);
-    sumIncome.textContent = fmtCurrency(totalIncome);
-    sumExpense.textContent = fmtCurrency(totalExpense);
-    balance.textContent = fmtCurrency(totalIncome-totalExpense);
-  }
-
-  function renderBudgetGlance(){
-    const now = new Date();
-    const exp = state.entries.filter(e=> e.kind==='expense' && sameMonth(e.date, now.getFullYear(), now.getMonth()));
-    const byCat = {};
-    exp.forEach(e=> byCat[e.category] = (byCat[e.category]||0) + e.amount);
-
-    const items = Object.entries(state.budgets).sort((a,b)=> (b[1]-a[1])).slice(0,6);
-    const host = budgetGlance; host.innerHTML = '';
-    if(items.length===0){ host.innerHTML = '<div class="text-sm opacity-70">לא הוגדרו תקציבים עדיין. עברי ללשונית תקציב.</div>'; return; }
-    items.forEach(([cat, limit])=>{
-      const used = byCat[cat]||0; const pct = Math.min(100, Math.round(100*used/limit));
-      const color = pct>=100? 'bg-rose-500' : pct>=80? 'bg-amber-500' : 'bg-indigo-500';
-      const row = document.createElement('div');
-      row.innerHTML = `
-        <div class="flex justify-between text-sm mb-1"><span>${cat}</span><span>${fmtCurrency(used)} / ${fmtCurrency(limit)}</span></div>
-        <div class="progress"><span class="${color}" style="width:${pct}%;"></span></div>`;
-      host.appendChild(row);
-    });
-  }
-
-  function renderTemplates(){
-    const list = state.templates; const host = templatesList; host.innerHTML='';
-    document.getElementById('templatesCard').hidden = list.length===0;
-    list.forEach((t,i)=>{
-      const b = document.createElement('button');
-      b.className = 'pill bg-slate-100 dark:bg-slate-700 hover:bg-slate-200';
-      b.textContent = `${t.kind==='expense'?'⬇️':'⬆️'} ${t.category} – ${fmtCurrency(t.amount)}` + (t.note?` • ${t.note}`:'');
-      b.addEventListener('click',()=>{
-        setKind(t.kind); buildCategories();
-        category.value = t.category; amount.value = t.amount; note.value = t.note; dateEl.value = todayStr();
-      });
-      host.appendChild(b);
-    });
-  }
-
-  function renderHistory(){
-    const term = (search.value||'').trim();
-    const kind = filterKind.value;
-    const entries = state.entries.filter(e=>
-      (kind==='all' || e.kind===kind) &&
-      (term==='' || (e.category+" "+(e.note||'')).includes(term))
-    );
-    historyList.innerHTML = '';
-    if(entries.length===0){ historyList.innerHTML = '<li class="py-6 text-center opacity-70">אין תנועות להצגה</li>'; return; }
-    entries.forEach(e=>{
-      const li = document.createElement('li');
-      li.className = 'py-3 flex items-center gap-3';
-      li.innerHTML = `
-        <div class="w-9 h-9 grid place-items-center rounded-2xl ${e.kind==='expense'?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'}">${e.kind==='expense'?'⬇️':'⬆️'}</div>
-        <div class="flex-1 min-w-0">
-          <div class="flex justify-between items-baseline gap-2">
-            <div class="font-medium truncate">${e.category}${e.note? ' • '+escapeHtml(e.note):''}</div>
-            <div class="font-bold ${e.kind==='expense'?'text-rose-600':'text-emerald-600'}">${fmtCurrency(e.amount)}</div>
-          </div>
-          <div class="text-xs opacity-70">${new Intl.DateTimeFormat('he-IL').format(new Date(e.date))}</div>
-        </div>
-        <div class="flex items-center gap-1">
-          <button class="pill bg-slate-100 dark:bg-slate-700" data-act="edit">עריכה</button>
-          <button class="pill bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200" data-act="del">מחיקה</button>
-        </div>`;
-
-      li.querySelector('[data-act="del"]').addEventListener('click',()=>{
-        if(confirm('למחוק פעולה זו?')){
-          state.entries = state.entries.filter(x=> x.id!==e.id);
-          save(LS_KEYS.entries, state.entries);
-          renderHistory(); renderSnapshot(); renderBudgetGlance(); updateCharts();
-        }
-      });
-      li.querySelector('[data-act="edit"]').addEventListener('click',()=> editEntry(e));
-      historyList.appendChild(li);
-    });
-  }
-
-  function editEntry(e){
-    const newAmt = prompt('סכום חדש (₪)', e.amount);
-    if(newAmt==null) return;
-    const v = parseFloat(newAmt);
-    if(!v || v<=0) return alert('סכום לא תקין');
-    e.amount = +v.toFixed(2);
-    const newNote = prompt('תיאור (אפשר להשאיר ריק)', e.note||'');
-    if(newNote!==null) e.note = newNote.trim();
-    save(LS_KEYS.entries, state.entries);
-    toast('עודכן ✔️');
-    renderHistory(); renderSnapshot(); renderBudgetGlance(); updateCharts();
-  }
-
-  function renderBudgets(){
-    budgetList.innerHTML = '';
-    const cats = Array.from(new Set([ ...state.categories.expense, ...Object.keys(state.budgets) ]));
-    cats.forEach(c=> budgetList.appendChild(budgetRow(c, state.budgets[c]||'')) );
-  }
-
-  function budgetRow(cat, amt){
-    const row = document.createElement('div'); row.dataset.row='1'; row.className='grid grid-cols-5 gap-2 items-center';
-    row.innerHTML = `
-      <input name="cat" class="col-span-3 rounded-2xl px-3 py-2 bg-white/80 dark:bg-slate-800/70" value="${cat||''}" placeholder="שם קטגוריה" />
-      <input name="amt" type="number" min="0" step="0.01" class="col-span-2 rounded-2xl px-3 py-2 bg-white/80 dark:bg-slate-800/70" value="${amt}" placeholder="תקציב חודשי (₪)" />`;
-    return row;
-  }
-
-  function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m])); }
-
-  // ===== Charts =====
-  function updateCharts(){
-    const now = new Date();
-    const month = state.entries.filter(e=> sameMonth(e.date, now.getFullYear(), now.getMonth()));
-    const exp = month.filter(e=> e.kind==='expense');
-
-    // Pie by category
-    const byCat = {};
-    exp.forEach(e=> byCat[e.category] = (byCat[e.category]||0)+e.amount);
-    const pieData = { labels: Object.keys(byCat), datasets:[{ data: Object.values(byCat) }] };
-    const pieEl = document.getElementById('pieCats');
-    state.charts.pie && state.charts.pie.destroy();
-    state.charts.pie = new Chart(pieEl, { type:'doughnut', data: pieData, options:{ plugins:{ legend:{ position:'bottom' } } } });
-
-    // Line daily net
-    const map = new Map();
-    month.forEach(e=>{
-      const d = e.date.slice(0,10);
-      const val = (e.kind==='income'? e.amount : -e.amount);
-      map.set(d, (map.get(d)||0) + val);
-    });
-    const days = Array.from(map.keys()).sort();
-    const lineData = { labels: days, datasets:[{ label:'נטו יומי', data: days.map(d=> +map.get(d).toFixed(2) ) }] };
-    const lineEl = document.getElementById('lineDaily');
-    state.charts.line && state.charts.line.destroy();
-    state.charts.line = new Chart(lineEl, { type:'line', data: lineData, options:{ scales:{ y:{ ticks:{ callback:(v)=> '₪'+v } } } } });
-  }
-
-  // ===== Export / Import =====
-  function downloadCSV(){
-    const rows = [ ['תאריך','סוג','תיאור','קטגוריה','סכום'] ];
-    state.entries.slice().reverse().forEach(e=>{
-      rows.push([ e.date, (e.kind==='expense'?'הוצאה':'הכנסה'), e.note||'', e.category, e.amount ]);
-    });
-    const csv = rows.map(r=> r.map(v=> '"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
-    const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    triggerDownload(url, `קופה-קלה-ייצוא-${new Date().toISOString().slice(0,7)}.csv`);
-  }
-
-  function downloadJSON(){
-    const blob = new Blob([ JSON.stringify({ entries: state.entries, budgets: state.budgets, categories: state.categories }, null, 2) ], { type:'application/json' });
-    const url = URL.createObjectURL(blob);
-    triggerDownload(url, `קופה-קלה-גיבוי-${Date.now()}.json`);
-  }
-
-  function triggerDownload(url, filename){
-    const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  }
-
-  async function handleImportJSON(e){
-    const file = e.target.files[0]; if(!file) return; const text = await file.text();
-    try{
-      const obj = JSON.parse(text);
-      if(obj.entries){ state.entries = obj.entries; save(LS_KEYS.entries, state.entries); }
-      if(obj.budgets){ state.budgets = obj.budgets; save(LS_KEYS.budgets, state.budgets); }
-      if(obj.categories){ state.categories = obj.categories; save(LS_KEYS.categories, state.categories); }
-      toast('הנתונים יובאו בהצלחה');
-      refreshAll();
-    }catch(err){ alert('קובץ לא תקין'); }
-    importJSON.value = '';
-  }
-
-  // ===== Demo Seed =====
-  function seedDemo(append=false){
-    const base = [
-      {date: todayStr(), kind:'expense', category:'מזון', amount: 32.5, note:'קפה וכריך'},
-      {date: todayStr(), kind:'expense', category:'תחבורה', amount: 12.0, note:'רב קו'},
-      {date: todayStr(), kind:'income', category:'עבודה', amount: 450.0, note:'משמרת שישי'},
-      {date: todayStr(), kind:'expense', category:'בגדים', amount: 129.9, note:'טי-שירט'},
-      {date: todayStr(), kind:'expense', category:'בילויים', amount: 55.0, note:'סרט'},
-      {date: todayStr(), kind:'income', category:'משפחה', amount: 200.0, note:'עזרה מההורים'},
-    ];
-    state.entries = append ? base.concat(state.entries) : base;
-    state.budgets = { 'מזון': 900, 'תחבורה': 250, 'בגדים': 300, 'בילויים': 400, 'ספרים/לימודים': 150 };
-    save(LS_KEYS.entries, state.entries);
-    save(LS_KEYS.budgets, state.budgets);
-    save(LS_KEYS.categories, state.categories);
-    state.templates = [
-      {kind:'expense', category:'שכר דירה', amount: 1800, note:''},
-      {kind:'expense', category:'סלולר/אינטרנט', amount: 89, note:'חודשי'},
-      {kind:'income', category:'עבודה', amount: 450, note:'משמרת'},
-    ];
-    save(LS_KEYS.templates, state.templates);
-  }
-
-  function dedupTemplates(list){
-    const key = (t)=> [t.kind,t.category,t.note].join('|');
-    const seen = new Set();
-    return list.filter(t=> (seen.has(key(t))?false: (seen.add(key(t)),true)) );
-  }
-
-  // ===== View switching =====
-  function switchView(id){
-    document.querySelectorAll('main section').forEach(s=> s.classList.add('hidden'));
-    document.getElementById('view-'+id).classList.remove('hidden');
-    document.querySelectorAll('nav .tab').forEach(t=> t.classList.remove('tab-active'));
-    document.querySelector('nav .tab[data-nav="'+id+'"]').classList.add('tab-active');
-    if(id==='reports') updateCharts();
-    if(id==='budget') renderBudgets();
-    if(id==='history') renderHistory();
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  function refreshAll(){
-    monthLabel.textContent = 'חודש נוכחי: ' + monthName();
-    setKind(state.kind);
-    buildCategories();
-    dateEl.value = todayStr();
-    renderSnapshot();
-    renderBudgetGlance();
-    renderTemplates();
-    renderHistory();
-    if(!document.getElementById('view-reports').classList.contains('hidden')) updateCharts();
-  }
-
-  // ===== Boot =====
-  refreshAll();
-
-  </script>
-</body>
-</html>
+    // Utility Functions
+    const UTILS = {
+      formatCurrency(amount) {
+        return new Intl.NumberFormat('he-IL', {
+          style: 'currency',
+          currency: 'ILS',
+          maximumFractionDigits: 0
+        }).format(amount || 0);
+      },
+      
+      formatDate(dateString) {
+        return new Intl.DateTimeFormat('he-IL', {
+          day: 'numeric',
+          month: 'short',
+          year: '2-digit'
+        }).format(new Date(dateString));
+      },
+      
+      getTodayString() {
+        return new Date().toISOString().slice(0, 10);
+      },
+      
+      getMonthName() {
+        return new Intl.DateTimeFormat('he-IL', {
+          month: 'long',
+          year: 'numeric'
+        }).format(new Date());
+      },
+      
+      isCurrentMonth(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+      },
