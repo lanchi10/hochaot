@@ -298,6 +298,10 @@
             margin-bottom: 15px;
         }
 
+        .tools-grid-full {
+            grid-column: 1 / -1;
+        }
+
         .btn-tool {
             background: #2196F3;
             color: white;
@@ -546,9 +550,10 @@
         <div class="tools-section">
             <h3>🛠️ כלים</h3>
             <div class="tools-grid">
+                <button class="btn-tool" onclick="showCategoryManager()">🏷️ ניהול קטגוריות</button>
                 <button class="btn-tool" onclick="exportToCSV()">📥 גיבוי CSV</button>
                 <button class="btn-tool" onclick="showMonthlyReport()">📊 דוח חודשי</button>
-                <button class="btn-tool" onclick="showCategoryReport()">🏷️ דוח קטגוריות</button>
+                <button class="btn-tool" onclick="showCategoryReport()">📋 דוח קטגוריות</button>
                 <button class="btn-tool" onclick="clearAllData()">🗑️ נקה הכל</button>
             </div>
         </div>
@@ -576,6 +581,31 @@
     </div>
 
     <!-- Edit Modal -->
+    <!-- Category Manager Modal -->
+    <div id="categoryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏷️ ניהול קטגוריות</h3>
+                <span class="close" onclick="closeCategoryModal()">&times;</span>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h4>➕ הוסף קטגוריה חדשה</h4>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="newCategoryName" placeholder="שם הקטגוריה" style="flex: 1;">
+                    <input type="text" id="newCategoryIcon" placeholder="🏷️" style="width: 60px;" maxlength="2">
+                    <button class="btn-tool" onclick="addNewCategory()" style="padding: 12px; width: auto;">הוסף</button>
+                </div>
+            </div>
+
+            <div>
+                <h4>📝 קטגוריות קיימות</h4>
+                <div id="categoriesList" style="max-height: 300px; overflow-y: auto;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -594,15 +624,7 @@
                 <div class="form-group">
                     <label>קטגוריה</label>
                     <select id="editCategory">
-                        <option value="שונות">שונות</option>
-                        <option value="מזון">🍽️ מזון</option>
-                        <option value="תחבורה">🚗 תחבורה</option>
-                        <option value="בילויים">🎬 בילויים</option>
-                        <option value="שכירות">🏠 שכירות</option>
-                        <option value="משכורת">💼 משכורת</option>
-                        <option value="השקעות">📈 השקעות</option>
-                        <option value="קניות">🛒 קניות</option>
-                        <option value="בריאות">⚕️ בריאות</option>
+                        <!-- Categories will be populated dynamically -->
                     </select>
                 </div>
                 <div class="form-group">
@@ -616,8 +638,33 @@
 
     <script>
         let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
         let currentEditId = null;
         let currentAnalysisData = '';
+
+        // Default categories
+        const defaultCategories = [
+            { name: 'שונות', icon: '🏷️' },
+            { name: 'מזון', icon: '🍽️' },
+            { name: 'תחבורה', icon: '🚗' },
+            { name: 'בילויים', icon: '🎬' },
+            { name: 'שכירות', icon: '🏠' },
+            { name: 'משכורת', icon: '💼' },
+            { name: 'השקעות', icon: '📈' },
+            { name: 'קניות', icon: '🛒' },
+            { name: 'בריאות', icon: '⚕️' }
+        ];
+
+        function getAllCategories() {
+            // Combine default categories with custom ones, avoid duplicates
+            const allCategories = [...defaultCategories];
+            customCategories.forEach(customCat => {
+                if (!allCategories.find(cat => cat.name === customCat.name)) {
+                    allCategories.push(customCat);
+                }
+            });
+            return allCategories;
+        }
 
         // Initialize the app safely with multiple checks
         function safeInitialize() {
@@ -655,6 +702,7 @@
                     
                     updateDisplay();
                     updateFilters();
+                    populateCategories(); // Add this line
                     
                     // Auto-focus amount field for quick entry
                     setTimeout(() => {
@@ -1424,6 +1472,168 @@ ${transactions.map(t => {
 
         function clearDraft() {
             localStorage.removeItem('draft');
+        }
+
+        // Category Management Functions
+        function populateCategories() {
+            const categories = getAllCategories();
+            const categorySelect = document.getElementById('category');
+            const editCategorySelect = document.getElementById('editCategory');
+            
+            if (categorySelect) {
+                categorySelect.innerHTML = categories.map(cat => 
+                    `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`
+                ).join('');
+                categorySelect.value = 'שונות'; // Set default
+            }
+            
+            if (editCategorySelect) {
+                editCategorySelect.innerHTML = categories.map(cat => 
+                    `<option value="${cat.name}">${cat.icon} ${cat.name}</option>`
+                ).join('');
+            }
+        }
+
+        function showCategoryManager() {
+            updateCategoriesList();
+            document.getElementById('categoryModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryIcon').value = '';
+        }
+
+        function updateCategoriesList() {
+            const categoriesList = document.getElementById('categoriesList');
+            if (!categoriesList) return;
+            
+            const categories = getAllCategories();
+            const usedCategories = [...new Set(transactions.map(t => t.category))];
+            
+            categoriesList.innerHTML = categories.map(category => {
+                const isUsed = usedCategories.includes(category.name);
+                const isDefault = defaultCategories.find(cat => cat.name === category.name);
+                const usageCount = transactions.filter(t => t.category === category.name).length;
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px; background: ${isUsed ? '#f0f8ff' : 'white'};">
+                        <div>
+                            <span style="font-size: 18px; margin-left: 8px;">${category.icon}</span>
+                            <span style="font-weight: ${isUsed ? 'bold' : 'normal'};">${category.name}</span>
+                            ${isUsed ? `<span style="color: #666; font-size: 12px; margin-right: 8px;">(${usageCount} תנועות)</span>` : ''}
+                        </div>
+                        <div>
+                            ${!isDefault ? `
+                                <button class="action-btn edit-btn" onclick="editCategoryName('${category.name}')" style="margin-left: 5px;">✏️</button>
+                                <button class="action-btn delete-btn" onclick="deleteCategory('${category.name}')">🗑️</button>
+                            ` : `
+                                <span style="color: #999; font-size: 12px;">ברירת מחדל</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function addNewCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const icon = document.getElementById('newCategoryIcon').value.trim() || '🏷️';
+            
+            if (!name) {
+                showAlert('אנא הכנס שם לקטגוריה');
+                return;
+            }
+            
+            const allCategories = getAllCategories();
+            if (allCategories.find(cat => cat.name === name)) {
+                showAlert('קטגוריה כבר קיימת');
+                return;
+            }
+            
+            const newCategory = { name, icon };
+            customCategories.push(newCategory);
+            localStorage.setItem('customCategories', JSON.stringify(customCategories));
+            
+            populateCategories();
+            updateCategoriesList();
+            updateFilters();
+            
+            // Clear form
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryIcon').value = '';
+            
+            showAlert(`✅ קטגוריה "${name}" נוספה!`);
+        }
+
+        function editCategoryName(oldName) {
+            const newName = prompt(`שנה את שם הקטגוריה:`, oldName);
+            if (!newName || newName.trim() === '' || newName === oldName) return;
+            
+            const trimmedName = newName.trim();
+            const allCategories = getAllCategories();
+            if (allCategories.find(cat => cat.name === trimmedName)) {
+                showAlert('קטגוריה כבר קיימת');
+                return;
+            }
+            
+            // Update custom categories
+            const categoryIndex = customCategories.findIndex(cat => cat.name === oldName);
+            if (categoryIndex !== -1) {
+                customCategories[categoryIndex].name = trimmedName;
+                localStorage.setItem('customCategories', JSON.stringify(customCategories));
+            }
+            
+            // Update all transactions with this category
+            transactions.forEach(transaction => {
+                if (transaction.category === oldName) {
+                    transaction.category = trimmedName;
+                }
+            });
+            
+            saveTransactions();
+            populateCategories();
+            updateCategoriesList();
+            updateFilters();
+            updateDisplay();
+            
+            showAlert(`✅ קטגוריה עודכנה ל-"${trimmedName}"`);
+        }
+
+        function deleteCategory(categoryName) {
+            const usageCount = transactions.filter(t => t.category === categoryName).length;
+            
+            if (usageCount > 0) {
+                if (!confirm(`קטגוריה "${categoryName}" בשימוש ב-${usageCount} תנועות.\nאם תמחק את הקטגוריה, התנועות יעברו לקטגוריית "שונות".\nהאם להמשיך?`)) {
+                    return;
+                }
+                
+                // Move transactions to "שונות"
+                transactions.forEach(transaction => {
+                    if (transaction.category === categoryName) {
+                        transaction.category = 'שונות';
+                    }
+                });
+                saveTransactions();
+            } else {
+                if (!confirm(`למחוק את קטגוריה "${categoryName}"?`)) {
+                    return;
+                }
+            }
+            
+            // Remove from custom categories
+            customCategories = customCategories.filter(cat => cat.name !== categoryName);
+            localStorage.setItem('customCategories', JSON.stringify(customCategories));
+            
+            populateCategories();
+            updateCategoriesList();
+            updateFilters();
+            updateDisplay();
+            
+            showAlert(`🗑️ קטגוריה "${categoryName}" נמחקה`);
         }
 
         // Initialize draft saving when DOM is ready
