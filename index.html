@@ -109,6 +109,7 @@
       background: #1e293b;
       border-color: #334155;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      color: #e2e8f0;
     }
 
     /* Button Styles */
@@ -269,6 +270,7 @@
       border-top: 3px solid transparent;
       transition: all 0.2s ease;
       min-height: 44px;
+      cursor: pointer;
     }
 
     .nav-item.active {
@@ -296,6 +298,10 @@
       height: 100%;
       background: linear-gradient(90deg, var(--primary), var(--primary-light));
       transition: width 0.3s ease;
+    }
+
+    .dark .progress-bar {
+      background: #475569;
     }
 
     /* History Item */
@@ -342,7 +348,7 @@
     /* Templates */
     .template-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: 1fr;
       gap: 8px;
     }
 
@@ -401,6 +407,7 @@
 
     .dark .modal-content {
       background: #1e293b;
+      color: #e2e8f0;
     }
 
     .modal-overlay.show .modal-content {
@@ -499,6 +506,20 @@
       pointer-events: none;
     }
 
+    /* Budget item */
+    .budget-item {
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .dark .budget-item {
+      background: #334155;
+      border-color: #475569;
+    }
+
     /* Responsive text */
     @media (max-width: 360px) {
       .form-input {
@@ -548,7 +569,7 @@
       <section id="view-add">
         <!-- Amount Input -->
         <div class="card">
-          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);">סכום</label>
+          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);" class="dark:text-gray-300">סכום</label>
           <div style="position: relative;">
             <input id="amount" type="number" inputmode="decimal" min="0" step="0.01" 
               class="form-input amount-input" placeholder="0" required />
@@ -558,9 +579,9 @@
 
         <!-- Transaction Type -->
         <div class="card">
-          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);">סוג פעולה</label>
+          <label style="display: block; font-weight: 600; margin-bottom: 12px; color: var(--gray-dark);" class="dark:text-gray-300">סוג פעולה</label>
           <div class="kind-selector">
-            <div class="kind-btn expense" data-kind="expense">
+            <div class="kind-btn expense active" data-kind="expense">
               <div style="font-size: 24px; margin-bottom: 4px;">💸</div>
               <div style="font-weight: 500;">הוצאה</div>
             </div>
@@ -575,20 +596,28 @@
         <div class="card">
           <form id="quickForm">
             <div style="margin-bottom: 16px;">
-              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">קטגוריה</label>
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);" class="dark:text-gray-300">קטגוריה</label>
               <select id="category" class="form-input" required>
                 <option value="">בחר קטגוריה</option>
               </select>
+              <button type="button" id="addCategoryBtn" style="margin-top: 8px; color: var(--primary); font-size: 14px; cursor: pointer; background: none; border: none; text-decoration: underline;">
+                ➕ הוסף קטגוריה חדשה
+              </button>
             </div>
             
             <div style="margin-bottom: 16px;">
-              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">תאריך</label>
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);" class="dark:text-gray-300">תאריך</label>
               <input id="date" type="date" class="form-input" />
             </div>
             
             <div style="margin-bottom: 20px;">
-              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);">תיאור (אופציונלי)</label>
+              <label style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-dark);" class="dark:text-gray-300">תיאור (אופציונלי)</label>
               <input id="note" class="form-input" placeholder="למשל: קפה עם חברים, תדלוק..." />
+            </div>
+            
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+              <input type="checkbox" id="saveTemplate" style="transform: scale(1.2);">
+              <label for="saveTemplate" style="font-size: 14px; color: var(--gray-dark);" class="dark:text-gray-300">שמור כתבנית מהירה</label>
             </div>
             
             <button type="submit" class="btn btn-primary" style="width: 100%; font-size: 16px; font-weight: 600;">
@@ -610,9 +639,11 @@
         <div class="card" id="budgetOverview">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h3 style="font-weight: 600; margin: 0;">מצב תקציב</h3>
-            <button class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;" data-nav="budget">📊 ניהול</button>
+            <button class="btn btn-outline nav-trigger" style="font-size: 12px; padding: 6px 12px;" data-nav="budget">📊 ניהול</button>
           </div>
-          <div id="budgetGlance"></div>
+          <div id="budgetGlance">
+            <div style="color: var(--gray); font-size: 14px;">הגדר תקציבים כדי לראות מצב כאן</div>
+          </div>
         </div>
       </section>
 
@@ -662,8 +693,10 @@
         <div class="card">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px;">
             <button id="exportBtn" class="btn btn-outline" style="font-size: 12px;">📤 ייצוא</button>
-            <button id="importBtn" class="btn btn-outline" style="font-size: 12px;">📥 ייבוא</button>
-            <input type="file" id="importFile" accept=".json" style="display: none;" />
+            <label class="btn btn-outline" style="font-size: 12px; cursor: pointer;">
+              📥 ייבוא
+              <input type="file" id="importFile" accept=".json" style="display: none;" />
+            </label>
           </div>
           <button id="clearAllBtn" class="btn btn-danger" style="width: 100%; font-size: 12px;">🗑️ מחק הכל</button>
         </div>
@@ -677,22 +710,22 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-      <a href="#" class="nav-item active" data-nav="add">
+      <div class="nav-item active" data-nav="add">
         <div class="nav-icon">➕</div>
         <div>הוספה</div>
-      </a>
-      <a href="#" class="nav-item" data-nav="reports">
+      </div>
+      <div class="nav-item" data-nav="reports">
         <div class="nav-icon">📊</div>
         <div>דוחות</div>
-      </a>
-      <a href="#" class="nav-item" data-nav="budget">
+      </div>
+      <div class="nav-item" data-nav="budget">
         <div class="nav-icon">💳</div>
         <div>תקציב</div>
-      </a>
-      <a href="#" class="nav-item" data-nav="history">
+      </div>
+      <div class="nav-item" data-nav="history">
         <div class="nav-icon">📋</div>
         <div>היסטוריה</div>
-      </a>
+      </div>
     </nav>
   </div>
 
@@ -715,8 +748,8 @@
         </label>
       </div>
       
-      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;">
-        <div style="font-size: 13px; color: var(--gray);">
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 16px;" class="dark:border-gray-600">
+        <div style="font-size: 13px; color: var(--gray);" class="dark:text-gray-400">
           <div style="margin-bottom: 8px;">✓ שמירה מקומית בטוחה</div>
           <div style="margin-bottom: 8px;">✓ ייצוא וגיבוי נתונים</div>
           <div>✓ ממשק מותאם לנייד</div>
@@ -725,76 +758,18 @@
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="toast"></div>
-
-  <script>
-    // App State
-    const APP_STATE = {
-      currentView: 'add',
-      currentKind: 'expense',
-      entries: JSON.parse(localStorage.getItem('entries') || '[]'),
-      budgets: JSON.parse(localStorage.getItem('budgets') || '{}'),
-      categories: JSON.parse(localStorage.getItem('categories') || '{"expense":["מזון","תחבורה","בילויים","קניות","בגדים","בריאות","בית","אחר"],"income":["משכורת","פרילנס","מתנות","השקעות","אחר"]}'),
-      templates: JSON.parse(localStorage.getItem('templates') || '[]'),
-      charts: { expense: null, daily: null }
-    };
-
-    // Theme Management
-    const THEME = {
-      current: localStorage.getItem('theme') || 'light',
+  <!-- Add Category Modal -->
+  <div id="addCategoryModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="font-weight: 600; margin: 0;">קטגוריה חדשה</h3>
+        <button id="closeCategoryModal" class="btn btn-ghost" style="padding: 6px;">✖️</button>
+      </div>
       
-      init() {
-        this.apply();
-        document.getElementById('darkModeToggle').checked = this.current === 'dark';
-      },
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 600; margin-bottom: 8px;">שם הקטגוריה</label>
+        <input id="newCategoryInput" class="form-input" placeholder="למשל: חינוך, ביטוח, מתנות..." />
+      </div>
       
-      toggle() {
-        this.current = this.current === 'light' ? 'dark' : 'light';
-        this.apply();
-        this.save();
-      },
-      
-      apply() {
-        document.documentElement.classList.toggle('dark', this.current === 'dark');
-      },
-      
-      save() {
-        localStorage.setItem('theme', this.current);
-      }
-    };
-
-    // Utility Functions
-    const UTILS = {
-      formatCurrency(amount) {
-        return new Intl.NumberFormat('he-IL', {
-          style: 'currency',
-          currency: 'ILS',
-          maximumFractionDigits: 0
-        }).format(amount || 0);
-      },
-      
-      formatDate(dateString) {
-        return new Intl.DateTimeFormat('he-IL', {
-          day: 'numeric',
-          month: 'short',
-          year: '2-digit'
-        }).format(new Date(dateString));
-      },
-      
-      getTodayString() {
-        return new Date().toISOString().slice(0, 10);
-      },
-      
-      getMonthName() {
-        return new Intl.DateTimeFormat('he-IL', {
-          month: 'long',
-          year: 'numeric'
-        }).format(new Date());
-      },
-      
-      isCurrentMonth(dateString) {
-        const date = new Date(dateString);
-        const now = new Date();
-        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-      },
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <button id="saveCategoryBtn" class="btn btn-primary">
